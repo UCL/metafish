@@ -1,12 +1,12 @@
-readme.txt for TwoStagePoisson
-==============================
+readme.txt for metafish
+=======================
 
 Folder ado
 Description
 	adofiles for other programs
 Contents (packages)
 	pllf - compute profile log likelihood
-	meta2p (unpublished, ado file only) - two-stage Poisson meta-analysis
+	metafish (unpublished) - two-stage Poisson meta-analysis
 	simrun (unpublished) - utility to run simulation studies
 	simsum - compute performance measures for simulation studies
 	siman - tabulate and graph performance measures for simulation studies
@@ -29,7 +29,7 @@ Inputs
 	siloes.do - repeatedly split the data into siloes and analyse by 1-stage and 2-stage Normal. Extract one typical data set and also analyse it by 2-stage Poisson.
 Outputs
 	siloes.log
-	siloes25_11.dta - the one typical data set
+	siloes25_12.dta - the one typical data set
 
 Folder simulation
 Description

@@ -1,6 +1,6 @@
 <a href ="https://www.innovative-ctu.ucl.ac.uk/"><img src="UCL_Logo_H_2C_DP_RGB_Innov-Clinical-Trials-Unit.png" width="50%" /></a>
 
-# TwoStagePoisson: code for paper "A Poisson approximation for two-stage meta-analysis of time-to-event data"
+# metafish: code for paper "A Poisson approximation for two-stage meta-analysis of time-to-event data"
 
 Code author: Ian White
 
