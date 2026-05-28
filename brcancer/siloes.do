@@ -2,7 +2,7 @@
 siloes.do
 Multiply split the German breast cancer data set into siloes, 
 	analyse by IPD MA,
-	and compare meta2p with metan for one of the splits
+	and compare metafish with metan for one of the splits
 IW 23jan2026
 minor revision 9apr2026, 24apr2026
 bug fix to make the data splits reproducible, 28may2026
@@ -19,7 +19,7 @@ set linesize 100
 log using siloes, text replace
 
 version
-which meta2p
+which metafish
 
 local reps 50
 set seed 461860
@@ -107,9 +107,9 @@ l, noo clean
 metan b se
 frame post res25_12 ("2SN") (r(eff)) (r(se_eff))
 // two-stage Poisson
-meta2p b se, d(d1 d0) py(p1 p0)
+metafish b se, d(d1 d0) py(p1 p0)
 frame post res25_12 ("2SP") (r(eff)) (r(se_eff))
-meta2p b se, d(d1 d0) py(p1 p0) wt
+metafish b se, d(d1 d0) py(p1 p0) wt
 frame post res25_12 ("2SPW") (r(eff)) (r(se_eff))
 
 frame res25_12: l, noo clean

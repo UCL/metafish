@@ -125,7 +125,7 @@ if _rc==0 {
 
 * CE method 3: 2-stage Poisson, unweighted
 timer on 3
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study)
+cap metafish b se, d(d1 d0) py(p1 p0) study(study)
 timer off 3
 if _rc==1 exit 1
 if _rc==0 {
@@ -138,7 +138,7 @@ if _rc==0 {
 
 * CE method 4: 2-stage Poisson, weighted
 timer on 4
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study) wt
+cap metafish b se, d(d1 d0) py(p1 p0) study(study) wt
 timer off 4
 if _rc==1 exit 1
 if _rc==0 {
@@ -177,7 +177,7 @@ if _rc==0 {
 
 * RE method 7: 2-stage Poisson, unweighted
 timer on 7
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re 
+cap metafish b se, d(d1 d0) py(p1 p0) study(study) re 
 timer off 7
 if _rc==1 exit 1
 if _rc==0 {
@@ -190,7 +190,7 @@ if _rc==0 {
 
 * RE method 8: 2-stage Poisson, weighted
 timer on 8
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re wt
+cap metafish b se, d(d1 d0) py(p1 p0) study(study) re wt
 timer off 8
 if _rc==1 exit 1
 if _rc==0 {
@@ -203,7 +203,7 @@ if _rc==0 {
 
 * RE method 9: 2-stage Poisson, unweighted, centred
 timer on 9
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re centre
+cap metafish b se, d(d1 d0) py(p1 p0) study(study) re centre
 timer off 9
 if _rc==1 exit 1
 if _rc==0 {
@@ -216,7 +216,7 @@ if _rc==0 {
 
 * RE method 10: 2-stage Poisson, weighted, centred
 timer on 10
-cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re wt centre
+cap metafish b se, d(d1 d0) py(p1 p0) study(study) re wt centre
 timer off 10
 if _rc==1 exit 1
 if _rc==0 {

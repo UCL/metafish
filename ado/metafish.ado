@@ -13,7 +13,7 @@ v0.3 IW 19sep2025
 	use pyears for single-zero studies
 v0.2 IW 10sep2025
 */
-prog def meta2p, rclass
+prog def metafish, rclass
 * run 2-stage Poisson-approx MA (CE and RE)
 * NB b is assumed to be a log HR or log RR for group 1 vs group 2
 syntax varlist(min=1 max=2) [if] [in], d(varlist min=2 max=2) [Study(varname) ///

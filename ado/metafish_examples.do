@@ -1,5 +1,5 @@
 /*
-meta2p_examples.do
+metafish_examples.do
 Run the examples in the help file
 */
 
@@ -19,4 +19,4 @@ mvmeta y S, fixed
 assert abs(_b[yz]-`b2sn')<1E-7
 */
 
-meta2p est se, d(d1 d0) 
+metafish est se, d(d1 d0) 

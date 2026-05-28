@@ -16,7 +16,7 @@ set linesize 100
 log using toydata, text replace
 
 version
-which meta2p
+which metafish
 
 // Compute PLLFs: a bit slow
 prog drop _all

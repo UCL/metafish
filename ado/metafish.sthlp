@@ -3,20 +3,20 @@
 {vieweralsosee "" "--"}{...}
 {vieweralsosee "Install command2" "ssc install command2"}{...}
 {vieweralsosee "Help command2 (if installed)" "help command2"}{...}
-{viewerjumpto "Syntax" "meta2p##syntax"}{...}
-{viewerjumpto "Description" "meta2p##description"}{...}
-{viewerjumpto "Options" "meta2p##options"}{...}
-{viewerjumpto "Remarks" "meta2p##remarks"}{...}
-{viewerjumpto "Examples" "meta2p##examples"}{...}
+{viewerjumpto "Syntax" "metafish##syntax"}{...}
+{viewerjumpto "Description" "metafish##description"}{...}
+{viewerjumpto "Options" "metafish##options"}{...}
+{viewerjumpto "Remarks" "metafish##remarks"}{...}
+{viewerjumpto "Examples" "metafish##examples"}{...}
 {title:Title}
 {phang}
-{bf:meta2p} {hline 2} Two-stage Poisson approximation for Meta-Analysis
+{bf:metafish} {hline 2} Two-stage Poisson approximation for Meta-Analysis
 
 {marker syntax}{...}
 {title:Syntax}
 {p 8 17 2}
-{cmdab:meta2p}
-est se
+{cmdab:metafish}
+{it:est se}
 [{help if}]
 [{help in}]
 [{cmd:,}
@@ -49,7 +49,7 @@ est se
 {title:Description}
 
 {pstd}
-{cmd:meta2p} performs meta-analysis of estimated treatment effects in time-to-event data, 
+{cmd:metafish} performs meta-analysis of estimated treatment effects in time-to-event data, 
 avoiding the Normal approximation. Instead, a Poisson likelihood is approximated by creating pseudo-data with the observed numbers 
 of events but artificial numbers of person-years such that the point estimate is reproduced exactly. A Poisson regression is then 
 fitted to the pseudo-data. Optionally, weights are applied to reproduce the standard errors exactly.
@@ -110,11 +110,11 @@ then a warning is printed and the deviating studies are listed. If {cmd:wt} is s
 
 {phang}Two-stage common-effect Poisson-approximation meta-analysis
 
-{phang}. {stata "meta2p est se, d(d1 d0)"}{p_end}
+{phang}. {stata "metafish est se, d(d1 d0)"}{p_end}
 
 {phang}Weighted version (gives same answers here)
 
-{phang}. {stata "meta2p est se, d(d1 d0) wt"}{p_end}
+{phang}. {stata "metafish est se, d(d1 d0) wt"}{p_end}
 
 
 {title:Stored results}
@@ -128,7 +128,7 @@ then a warning is printed and the deviating studies are listed. If {cmd:wt} is s
 
 
 {title:Author}
-{pstd}Ian White, MRC Clinical Trials Unit at UCL, London, UK.{break}
+{pstd}Ian White, UCL Innovative Clinical Trials Unit, London, UK.{break}
 Email: {browse "mailto:ian.white@ucl.ac.uk":Ian White}
 
 
