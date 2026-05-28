@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\ian\git\TwoStagePoisson\brcancer\siloes.log
   log type:  text
- opened on:   9 Apr 2026, 17:06:25
+ opened on:  28 May 2026, 09:55:40
 
 . 
 . version
@@ -82,16 +82,19 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
 > ions)")
   5.                 _dots `rep' 0
   6.                 cap drop random silo
-  7.                 gen random = runiform()
-  8.                 sort random
-  9.                 gen silo = int(`siloes'*(_n-1)/_N)+1
- 10.                 qui ipdmetan, study(silo) nograph: stcox hormon
- 11.                 frame post results (`siloes') (`rep') (r(eff)) (r(se_eff))
- 12.                 if `siloes'==25 & `rep'==11 qui save siloes`siloes'_`rep', replace
- 13.                 * a fairly typical data set
+  7.                 sort id // restore original sort order
+  8.                 gen double random = runiform() // double is included to make ties much less lik
+> ely
+  9.                 sort random id // id is included in order to sort consistently not arbitrarily,
+>  in the unlikely event of a tie on random
+ 10.                 gen silo = int(`siloes'*(_n-1)/_N)+1
+ 11.                 qui ipdmetan, study(silo) nograph: stcox hormon
+ 12.                 frame post results (`siloes') (`rep') (r(eff)) (r(se_eff))
+ 13.                 if `siloes'==25 & `rep'==11 qui save siloes`siloes'_`rep', replace
+ 14.                 * a fairly typical data set
 .         }
- 14.         frame results: label def siloes `siloes' "`siloes' siloes", modify      
- 15. }
+ 15.         frame results: label def siloes `siloes' "`siloes' siloes", modify      
+ 16. }
 2 siloes: simulation running (50 repetitions)
 ----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 
 ..................................................    50
@@ -115,41 +118,46 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
 
     Variable |        Obs        Mean    Std. err.       [95% conf. interval]
 -------------+---------------------------------------------------------------
-           b |         51   -.3617428    .0013499       -.3644541   -.3590316
-          se |         51    .1252271    .0000362        .1251544    .1252999
+           b |         51   -.3608508    .0009784       -.3628161   -.3588856
+          se |         51    .1253159    .0000471        .1252212    .1254105
 
 ----------------------------------------------------------------------------------------------------
 -> siloes = 5
 
     Variable |        Obs        Mean    Std. err.       [95% conf. interval]
 -------------+---------------------------------------------------------------
-           b |         51   -.3530768    .0027013       -.3585024   -.3476511
-          se |         51    .1260959    .0000753        .1259447    .1262472
+           b |         51   -.3536363    .0023727        -.358402   -.3488705
+          se |         51    .1261514    .0000709         .126009    .1262939
 
 ----------------------------------------------------------------------------------------------------
 -> siloes = 10
 
     Variable |        Obs        Mean    Std. err.       [95% conf. interval]
 -------------+---------------------------------------------------------------
-           b |         51   -.3376876    .0040135       -.3457491   -.3296262
-          se |         51    .1278764    .0001729        .1275292    .1282237
+           b |         51   -.3336186    .0031928       -.3400316   -.3272056
+          se |         51    .1275936    .0001204        .1273517    .1278354
 
 ----------------------------------------------------------------------------------------------------
 -> siloes = 25
 
     Variable |        Obs        Mean    Std. err.       [95% conf. interval]
 -------------+---------------------------------------------------------------
-           b |         51   -.2897171    .0067647       -.3033044   -.2761298
-          se |         51    .1326299    .0003092        .1320089    .1332508
+           b |         51   -.2755611    .0077405       -.2911083   -.2600138
+          se |         51     .132551    .0002856        .1319774    .1331245
 .         label val siloes siloes
-.         scatter se b if rep==0, ms(X) msize(*2) ///
+.         save siloes, replace
+file siloes.dta saved
+. }
+
+. 
+. frame results : ///
+>         scatter se b if rep==0, ms(X) msize(*2) ///
 >         || scatter se b if rep>0, /*mlab(rep)*/ ms(oh) ///
 >         || scatter se b if rep==11 & siloes==25, /*mlab(rep)*/ ms(O) msize(*1.5) ///
->         by(siloes, note("")) legend(order(1 "1-stage" 2 "2-stage Normal")) ///
+>         by(siloes, note("")) legend(order(1 "Without splitting" 2 "2-stage Normal approx")) ///
 >         xline($b) yline($se) ///
 >         xtitle(Log hazard ratio) ytitle(Standard error) ///
 >         name(siloes, replace) $PPT
-. }
 
 . 
 . 
@@ -190,7 +198,64 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
       hormon |  -.3638988   .1250441    -2.91   0.004    -.6089808   -.1188167
 ------------------------------------------------------------------------------
 
-. frame post res25_11 ("1S") (_b[hormon]) (_se[hormon])
+. frame post res25_11 ("1Sun") (_b[hormon]) (_se[hormon])
+
+. 
+. // one-stage
+. stcox hormon i.silo, nohr
+
+        Failure _d: censrec
+  Analysis time _t: rectime
+
+Iteration 0:  Log likelihood = -1788.1731
+Iteration 1:  Log likelihood = -1772.4588
+Iteration 2:  Log likelihood = -1771.9644
+Iteration 3:  Log likelihood =  -1771.963
+Iteration 4:  Log likelihood =  -1771.963
+Refining estimates:
+Iteration 0:  Log likelihood =  -1771.963
+
+Cox regression with Breslow method for ties
+
+No. of subjects =     686                               Number of obs =    686
+No. of failures =     299
+Time at risk    = 771,400
+                                                        LR chi2(25)   =  32.42
+Log likelihood = -1771.963                              Prob > chi2   = 0.1462
+
+------------------------------------------------------------------------------
+          _t | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      hormon |  -.3276693   .1287229    -2.55   0.011    -.5799616    -.075377
+             |
+        silo |
+          2  |  -.7505752   .3873741    -1.94   0.053    -1.509815    .0086641
+          3  |  -.4686145   .3775159    -1.24   0.214    -1.208532     .271303
+          4  |  -.3996947   .3613243    -1.11   0.269    -1.107877    .3084879
+          5  |  -.9290225    .399584    -2.32   0.020    -1.712193   -.1458523
+          6  |  -.4435939   .3700269    -1.20   0.231    -1.168833    .2816456
+          7  |  -.5723988   .3775524    -1.52   0.129    -1.312388    .1675903
+          8  |  -.8050329   .4142823    -1.94   0.052    -1.617011    .0069454
+          9  |  -.9740341   .4291655    -2.27   0.023    -1.815183   -.1328852
+         10  |  -.2651979   .3615206    -0.73   0.463    -.9737652    .4433693
+         11  |  -1.043764   .4291956    -2.43   0.015    -1.884972   -.2025559
+         12  |    -.28456   .3782427    -0.75   0.452    -1.025902    .4567821
+         13  |  -.1578998   .3432701    -0.46   0.646    -.8306968    .5148971
+         14  |   -.595138   .3886521    -1.53   0.126    -1.356882    .1666062
+         15  |  -1.181207   .4500563    -2.62   0.009    -2.063301   -.2991129
+         16  |  -.8854251   .4125681    -2.15   0.032    -1.694044   -.0768065
+         17  |  -.3930611   .3774634    -1.04   0.298    -1.132876    .3467535
+         18  |  -.7915026   .3773746    -2.10   0.036    -1.531143    -.051862
+         19  |  -.8647356   .3989376    -2.17   0.030    -1.646639   -.0828322
+         20  |  -.4147433   .3614133    -1.15   0.251      -1.1231    .2936138
+         21  |  -.6362006   .3774149    -1.69   0.092     -1.37592    .1035189
+         22  |  -.5877148   .3772596    -1.56   0.119     -1.32713    .1517004
+         23  |  -.3541091   .3617062    -0.98   0.328     -1.06304     .354822
+         24  |  -.3447704   .3490381    -0.99   0.323    -1.028872    .3393318
+         25  |  -.5978302   .3690964    -1.62   0.105    -1.321246    .1255855
+------------------------------------------------------------------------------
+
+. frame post res25_11 ("1Sadj") (_b[hormon]) (_se[hormon])
 
 . 
 . tab silo hormon if _d
@@ -198,31 +263,31 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
            |   Hormonal therapy
       silo |         0          1 |     Total
 -----------+----------------------+----------
-         1 |         6          5 |        11 
-         2 |        10          3 |        13 
-         3 |         7          4 |        11 
-         4 |        12          3 |        15 
+         1 |         9          8 |        17 
+         2 |        10          1 |        11 
+         3 |         8          4 |        12 
+         4 |        12          2 |        14 
          5 |         7          3 |        10 
-         6 |        11          5 |        16 
-         7 |         6          3 |         9 
-         8 |         9          2 |        11 
-         9 |         9          0 |         9 
-        10 |        10          2 |        12 
-        11 |         8          5 |        13 
+         6 |         6          7 |        13 
+         7 |         8          4 |        12 
+         8 |         5          4 |         9 
+         9 |         6          2 |         8 
+        10 |        12          2 |        14 
+        11 |         6          2 |         8 
         12 |         6          6 |        12 
-        13 |         7          3 |        10 
-        14 |        16          0 |        16 
-        15 |         6          6 |        12 
-        16 |        10          5 |        15 
-        17 |         6          5 |        11 
-        18 |         8          5 |        13 
-        19 |         7          6 |        13 
-        20 |         8          4 |        12 
-        21 |         6          5 |        11 
-        22 |         5          5 |        10 
-        23 |         8          2 |        10 
-        24 |         8          2 |        10 
-        25 |         9          5 |        14 
+        13 |        13          4 |        17 
+        14 |         7          4 |        11 
+        15 |         3          4 |         7 
+        16 |         8          1 |         9 
+        17 |         9          3 |        12 
+        18 |         6          6 |        12 
+        19 |         7          3 |        10 
+        20 |        10          4 |        14 
+        21 |         9          3 |        12 
+        22 |         8          4 |        12 
+        23 |        10          4 |        14 
+        24 |        10          6 |        16 
+        25 |        10          3 |        13 
 -----------+----------------------+----------
      Total |       205         94 |       299 
 
@@ -233,24 +298,24 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -30.012115
-Iteration 1:  Log likelihood = -29.814841
-Iteration 2:  Log likelihood = -29.814494
+Iteration 0:  Log likelihood = -45.051297
+Iteration 1:  Log likelihood = -44.574465
+Iteration 2:  Log likelihood = -44.573126
 Refining estimates:
-Iteration 0:  Log likelihood = -29.814494
+Iteration 0:  Log likelihood = -44.573126
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     11
-Time at risk    = 32,073
-                                                        LR chi2(1)    =   0.40
-Log likelihood = -29.814494                             Prob > chi2   = 0.5296
+No. of failures =     17
+Time at risk    = 24,993
+                                                        LR chi2(1)    =   0.96
+Log likelihood = -44.573126                             Prob > chi2   = 0.3281
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.470758   .8947964     0.63   0.526     .4463519     4.84624
+      hormon |   1.619468   .7909927     0.99   0.324      .621759    4.218156
 ------------------------------------------------------------------------------
 
 -> silo==2 
@@ -258,24 +323,26 @@ Log likelihood = -29.814494                             Prob > chi2   = 0.5296
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -35.045976
-Iteration 1:  Log likelihood =  -35.01569
-Iteration 2:  Log likelihood =  -35.01562
+Iteration 0:  Log likelihood = -30.472059
+Iteration 1:  Log likelihood = -29.728389
+Iteration 2:  Log likelihood = -29.676859
+Iteration 3:  Log likelihood = -29.676216
+Iteration 4:  Log likelihood = -29.676215
 Refining estimates:
-Iteration 0:  Log likelihood =  -35.01562
+Iteration 0:  Log likelihood = -29.676215
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     13
-Time at risk    = 26,234
-                                                        LR chi2(1)    =   0.06
-Log likelihood = -35.01562                              Prob > chi2   = 0.8054
+No. of failures =     11
+Time at risk    = 32,865
+                                                        LR chi2(1)    =   1.59
+Log likelihood = -29.676215                             Prob > chi2   = 0.2071
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.181051   .7861188     0.25   0.803     .3204062     4.35348
+      hormon |   .3204392   .3367183    -1.08   0.279     .0408602    2.512987
 ------------------------------------------------------------------------------
 
 -> silo==3 
@@ -283,24 +350,24 @@ Log likelihood = -35.01562                              Prob > chi2   = 0.8054
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -31.100667
-Iteration 1:  Log likelihood =  -31.00047
-Iteration 2:  Log likelihood = -31.000406
+Iteration 0:  Log likelihood = -34.656436
+Iteration 1:  Log likelihood =  -34.54471
+Iteration 2:  Log likelihood = -34.544587
 Refining estimates:
-Iteration 0:  Log likelihood = -31.000406
+Iteration 0:  Log likelihood = -34.544587
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     11
-Time at risk    = 30,877
-                                                        LR chi2(1)    =   0.20
-Log likelihood = -31.000406                             Prob > chi2   = 0.6543
+No. of failures =     12
+Time at risk    = 28,569
+                                                        LR chi2(1)    =   0.22
+Log likelihood = -34.544587                             Prob > chi2   = 0.6362
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .7546083   .4797941    -0.44   0.658     .2170259    2.623805
+      hormon |   .7483101   .4652017    -0.47   0.641     .2212663    2.530742
 ------------------------------------------------------------------------------
 
 -> silo==4 
@@ -308,24 +375,26 @@ Log likelihood = -31.000406                             Prob > chi2   = 0.6543
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood =  -41.64643
-Iteration 1:  Log likelihood = -41.638258
-Iteration 2:  Log likelihood = -41.638253
+Iteration 0:  Log likelihood = -37.014359
+Iteration 1:  Log likelihood = -34.962857
+Iteration 2:  Log likelihood = -34.875667
+Iteration 3:  Log likelihood = -34.874929
+Iteration 4:  Log likelihood = -34.874929
 Refining estimates:
-Iteration 0:  Log likelihood = -41.638253
+Iteration 0:  Log likelihood = -34.874929
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     15
-Time at risk    = 29,725
-                                                        LR chi2(1)    =   0.02
-Log likelihood = -41.638253                             Prob > chi2   = 0.8982
+No. of failures =     14
+Time at risk    = 30,140
+                                                        LR chi2(1)    =   4.28
+Log likelihood = -34.874929                             Prob > chi2   = 0.0386
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.087729   .7094757     0.13   0.897     .3029152    3.905893
+      hormon |   .2548853   .1950163    -1.79   0.074     .0568956    1.141856
 ------------------------------------------------------------------------------
 
 -> silo==5 
@@ -333,25 +402,25 @@ Log likelihood = -41.638253                             Prob > chi2   = 0.8982
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -26.769934
-Iteration 1:  Log likelihood = -26.071276
-Iteration 2:  Log likelihood = -26.070695
-Iteration 3:  Log likelihood = -26.070695
+Iteration 0:  Log likelihood = -25.501376
+Iteration 1:  Log likelihood = -24.808892
+Iteration 2:  Log likelihood = -24.808268
+Iteration 3:  Log likelihood = -24.808268
 Refining estimates:
-Iteration 0:  Log likelihood = -26.070695
+Iteration 0:  Log likelihood = -24.808268
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
 No. of failures =     10
-Time at risk    = 33,561
-                                                        LR chi2(1)    =   1.40
-Log likelihood = -26.070695                             Prob > chi2   = 0.2370
+Time at risk    = 37,665
+                                                        LR chi2(1)    =   1.39
+Log likelihood = -24.808268                             Prob > chi2   = 0.2390
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .4442899   .3148452    -1.14   0.252     .1107807     1.78184
+      hormon |   .4418938   .3163967    -1.14   0.254     .1086066    1.797958
 ------------------------------------------------------------------------------
 
 -> silo==6 
@@ -359,25 +428,24 @@ Log likelihood = -26.070695                             Prob > chi2   = 0.2370
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood =   -42.3333
-Iteration 1:  Log likelihood =  -37.46535
-Iteration 2:  Log likelihood = -37.453689
-Iteration 3:  Log likelihood = -37.453687
+Iteration 0:  Log likelihood = -36.578874
+Iteration 1:  Log likelihood = -36.560813
+Iteration 2:  Log likelihood = -36.560813
 Refining estimates:
-Iteration 0:  Log likelihood = -37.453687
+Iteration 0:  Log likelihood = -36.560813
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     16
-Time at risk    = 30,090
-                                                        LR chi2(1)    =   9.76
-Log likelihood = -37.453687                             Prob > chi2   = 0.0018
+No. of failures =     13
+Time at risk    = 31,134
+                                                        LR chi2(1)    =   0.04
+Log likelihood = -36.560813                             Prob > chi2   = 0.8493
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .1773097   .1028853    -2.98   0.003     .0568612    .5529027
+      hormon |   .8987733   .5039408    -0.19   0.849     .2994903    2.697227
 ------------------------------------------------------------------------------
 
 -> silo==7 
@@ -385,24 +453,25 @@ Log likelihood = -37.453687                             Prob > chi2   = 0.0018
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -25.330983
-Iteration 1:  Log likelihood = -25.279903
-Iteration 2:  Log likelihood = -25.279862
+Iteration 0:  Log likelihood = -34.205851
+Iteration 1:  Log likelihood = -33.571497
+Iteration 2:  Log likelihood = -33.567552
+Iteration 3:  Log likelihood = -33.567552
 Refining estimates:
-Iteration 0:  Log likelihood = -25.279862
+Iteration 0:  Log likelihood = -33.567552
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =      9
-Time at risk    = 38,400
-                                                        LR chi2(1)    =   0.10
-Log likelihood = -25.279862                             Prob > chi2   = 0.7492
+No. of failures =     12
+Time at risk    = 31,657
+                                                        LR chi2(1)    =   1.28
+Log likelihood = -33.567552                             Prob > chi2   = 0.2585
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .7985429   .5682485    -0.32   0.752       .19796     3.22121
+      hormon |   .4815446   .3263139    -1.08   0.281     .1275935    1.817376
 ------------------------------------------------------------------------------
 
 -> silo==8 
@@ -410,25 +479,24 @@ Log likelihood = -25.279862                             Prob > chi2   = 0.7492
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -27.245803
-Iteration 1:  Log likelihood = -27.216053
-Iteration 2:  Log likelihood = -27.215989
-Iteration 3:  Log likelihood = -27.215989
+Iteration 0:  Log likelihood = -24.581513
+Iteration 1:  Log likelihood = -24.517186
+Iteration 2:  Log likelihood = -24.517186
 Refining estimates:
-Iteration 0:  Log likelihood = -27.215989
+Iteration 0:  Log likelihood = -24.517186
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     11
-Time at risk    = 29,343
-                                                        LR chi2(1)    =   0.06
-Log likelihood = -27.215989                             Prob > chi2   = 0.8071
+No. of failures =      9
+Time at risk    = 29,748
+                                                        LR chi2(1)    =   0.13
+Log likelihood = -24.517186                             Prob > chi2   = 0.7198
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .8243854   .6633032    -0.24   0.810     .1703142    3.990339
+      hormon |   .7857336   .5299323    -0.36   0.721     .2095023    2.946877
 ------------------------------------------------------------------------------
 
 -> silo==9 
@@ -436,58 +504,25 @@ Log likelihood = -27.215989                             Prob > chi2   = 0.8071
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -25.949023
-Iteration 1:  Log likelihood = -24.810833
-Iteration 2:  Log likelihood = -24.464801
-Iteration 3:  Log likelihood = -24.344634
-Iteration 4:  Log likelihood = -24.301302
-Iteration 5:  Log likelihood = -24.285476
-Iteration 6:  Log likelihood = -24.279669
-Iteration 7:  Log likelihood = -24.277535
-Iteration 8:  Log likelihood =  -24.27675
-Iteration 9:  Log likelihood = -24.276462
-Iteration 10: Log likelihood = -24.276355
-Iteration 11: Log likelihood = -24.276316
-Iteration 12: Log likelihood = -24.276302
-Iteration 13: Log likelihood = -24.276297
-Iteration 14: Log likelihood = -24.276295
-Iteration 15: Log likelihood = -24.276294
-Iteration 16: Log likelihood = -24.276294
-Iteration 17: Log likelihood = -24.276294
-Iteration 18: Log likelihood = -24.276294
-Iteration 19: Log likelihood = -24.276294
-Iteration 20: Log likelihood = -24.276294
-Iteration 21: Log likelihood = -24.276294
-Iteration 22: Log likelihood = -24.276294
-Iteration 23: Log likelihood = -24.276294
-Iteration 24: Log likelihood = -24.276294
-Iteration 25: Log likelihood = -24.276294
-Iteration 26: Log likelihood = -24.276294
-Iteration 27: Log likelihood = -24.276294
-Iteration 28: Log likelihood = -24.276294
-Iteration 29: Log likelihood = -24.276294
-Iteration 30: Log likelihood = -24.276294
-Iteration 31: Log likelihood = -24.276294
-Iteration 32: Log likelihood = -24.276294
-Iteration 33: Log likelihood = -24.276294
-Iteration 34: Log likelihood = -24.276294
-Iteration 35: Log likelihood = -24.276294
+Iteration 0:  Log likelihood = -23.608217
+Iteration 1:  Log likelihood = -23.068444
+Iteration 2:  Log likelihood =  -23.06353
+Iteration 3:  Log likelihood = -23.063528
 Refining estimates:
-Iteration 0:  Log likelihood = -24.276294
-Iteration 1:  Log likelihood = -24.276294
+Iteration 0:  Log likelihood = -23.063528
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =      9
-Time at risk    = 37,386
-                                                        LR chi2(1)    =   3.35
-Log likelihood = -24.276294                             Prob > chi2   = 0.0674
+No. of failures =      8
+Time at risk    = 31,280
+                                                        LR chi2(1)    =   1.09
+Log likelihood = -23.063528                             Prob > chi2   = 0.2966
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.72e-16   9.66e-09    -0.00   1.000            0           .
+      hormon |   .4443636   .3653775    -0.99   0.324     .0886827    2.226578
 ------------------------------------------------------------------------------
 
 -> silo==10 
@@ -495,25 +530,26 @@ Log likelihood = -24.276294                             Prob > chi2   = 0.0674
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -35.588475
-Iteration 1:  Log likelihood = -35.045282
-Iteration 2:  Log likelihood = -35.032219
-Iteration 3:  Log likelihood =   -35.0322
+Iteration 0:  Log likelihood = -41.588075
+Iteration 1:  Log likelihood = -40.221188
+Iteration 2:  Log likelihood = -40.164533
+Iteration 3:  Log likelihood = -40.164201
+Iteration 4:  Log likelihood = -40.164201
 Refining estimates:
-Iteration 0:  Log likelihood =   -35.0322
+Iteration 0:  Log likelihood = -40.164201
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     12
-Time at risk    = 31,352
-                                                        LR chi2(1)    =   1.11
-Log likelihood = -35.0322                               Prob > chi2   = 0.2915
+No. of failures =     14
+Time at risk    = 27,295
+                                                        LR chi2(1)    =   2.85
+Log likelihood = -40.164201                             Prob > chi2   = 0.0915
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .4662654   .3644882    -0.98   0.329     .1007473    2.157908
+      hormon |   .3189075   .2446169    -1.49   0.136     .0709175    1.434088
 ------------------------------------------------------------------------------
 
 -> silo==11 
@@ -521,24 +557,25 @@ Log likelihood = -35.0322                               Prob > chi2   = 0.2915
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood =  -38.63543
-Iteration 1:  Log likelihood = -38.531933
-Iteration 2:  Log likelihood = -38.531748
+Iteration 0:  Log likelihood = -23.853879
+Iteration 1:  Log likelihood = -23.309072
+Iteration 2:  Log likelihood = -23.304044
+Iteration 3:  Log likelihood = -23.304043
 Refining estimates:
-Iteration 0:  Log likelihood = -38.531748
+Iteration 0:  Log likelihood = -23.304043
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     13
-Time at risk    = 33,913
-                                                        LR chi2(1)    =   0.21
-Log likelihood = -38.531748                             Prob > chi2   = 0.6488
+No. of failures =      8
+Time at risk    = 33,311
+                                                        LR chi2(1)    =   1.10
+Log likelihood = -23.304043                             Prob > chi2   = 0.2943
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.301001   .7433394     0.46   0.645     .4245564    3.986757
+      hormon |   .4291017   .3652586    -0.99   0.320     .0809102    2.275712
 ------------------------------------------------------------------------------
 
 -> silo==12 
@@ -546,24 +583,24 @@ Log likelihood = -38.531748                             Prob > chi2   = 0.6488
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -33.532141
-Iteration 1:  Log likelihood = -32.620279
-Iteration 2:  Log likelihood = -32.608671
+Iteration 0:  Log likelihood = -31.806521
+Iteration 1:  Log likelihood = -31.782362
+Iteration 2:  Log likelihood = -31.782362
 Refining estimates:
-Iteration 0:  Log likelihood = -32.608671
+Iteration 0:  Log likelihood = -31.782362
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
 No. of failures =     12
-Time at risk    = 26,107
-                                                        LR chi2(1)    =   1.85
-Log likelihood = -32.608671                             Prob > chi2   = 0.1741
+Time at risk    = 25,259
+                                                        LR chi2(1)    =   0.05
+Log likelihood = -31.782362                             Prob > chi2   = 0.8260
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   2.254658   1.328757     1.38   0.168     .7102884    7.156926
+      hormon |   .8793767   .5141557    -0.22   0.826     .2795714    2.766032
 ------------------------------------------------------------------------------
 
 -> silo==13 
@@ -571,25 +608,25 @@ Log likelihood = -32.608671                             Prob > chi2   = 0.1741
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -28.934705
-Iteration 1:  Log likelihood = -28.802345
-Iteration 2:  Log likelihood = -28.801119
-Iteration 3:  Log likelihood = -28.801119
+Iteration 0:  Log likelihood = -47.304692
+Iteration 1:  Log likelihood = -47.230209
+Iteration 2:  Log likelihood = -47.230034
+Iteration 3:  Log likelihood = -47.230034
 Refining estimates:
-Iteration 0:  Log likelihood = -28.801119
+Iteration 0:  Log likelihood = -47.230034
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     10
-Time at risk    = 34,011
-                                                        LR chi2(1)    =   0.27
-Log likelihood = -28.801119                             Prob > chi2   = 0.6052
+No. of failures =     17
+Time at risk    = 28,525
+                                                        LR chi2(1)    =   0.15
+Log likelihood = -47.230034                             Prob > chi2   = 0.6992
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.447308   1.009291     0.53   0.596     .3689515    5.677443
+      hormon |   .8041901   .4619409    -0.38   0.704     .2608636    2.479156
 ------------------------------------------------------------------------------
 
 -> silo==14 
@@ -597,58 +634,24 @@ Log likelihood = -28.801119                             Prob > chi2   = 0.6052
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -46.636862
-Iteration 1:  Log likelihood =   -43.5478
-Iteration 2:  Log likelihood = -42.723375
-Iteration 3:  Log likelihood = -42.447562
-Iteration 4:  Log likelihood = -42.349401
-Iteration 5:  Log likelihood = -42.313718
-Iteration 6:  Log likelihood = -42.300649
-Iteration 7:  Log likelihood = -42.295849
-Iteration 8:  Log likelihood = -42.294084
-Iteration 9:  Log likelihood = -42.293435
-Iteration 10: Log likelihood = -42.293196
-Iteration 11: Log likelihood = -42.293108
-Iteration 12: Log likelihood = -42.293076
-Iteration 13: Log likelihood = -42.293064
-Iteration 14: Log likelihood = -42.293059
-Iteration 15: Log likelihood = -42.293058
-Iteration 16: Log likelihood = -42.293057
-Iteration 17: Log likelihood = -42.293057
-Iteration 18: Log likelihood = -42.293057
-Iteration 19: Log likelihood = -42.293057
-Iteration 20: Log likelihood = -42.293057
-Iteration 21: Log likelihood = -42.293057
-Iteration 22: Log likelihood = -42.293057
-Iteration 23: Log likelihood = -42.293057
-Iteration 24: Log likelihood = -42.293057
-Iteration 25: Log likelihood = -42.293057
-Iteration 26: Log likelihood = -42.293057
-Iteration 27: Log likelihood = -42.293057
-Iteration 28: Log likelihood = -42.293057
-Iteration 29: Log likelihood = -42.293057
-Iteration 30: Log likelihood = -42.293057
-Iteration 31: Log likelihood = -42.293057
-Iteration 32: Log likelihood = -42.293057
-Iteration 33: Log likelihood = -42.293057
-Iteration 34: Log likelihood = -42.293057
-Iteration 35: Log likelihood = -42.293057
+Iteration 0:  Log likelihood = -31.983762
+Iteration 1:  Log likelihood = -30.818381
+Iteration 2:  Log likelihood = -30.818357
 Refining estimates:
-Iteration 0:  Log likelihood = -42.293057
-Iteration 1:  Log likelihood = -42.293057
+Iteration 0:  Log likelihood = -30.818357
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     16
-Time at risk    = 27,877
-                                                        LR chi2(1)    =   8.69
-Log likelihood = -42.293057                             Prob > chi2   = 0.0032
+No. of failures =     11
+Time at risk    = 31,321
+                                                        LR chi2(1)    =   2.33
+Log likelihood = -30.818357                             Prob > chi2   = 0.1268
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.37e-16   5.15e-09    -0.00   1.000            0           .
+      hormon |   .3786786   .2478969    -1.48   0.138     .1049646    1.366151
 ------------------------------------------------------------------------------
 
 -> silo==15 
@@ -656,24 +659,24 @@ Log likelihood = -42.293057                             Prob > chi2   = 0.0032
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -34.741345
-Iteration 1:  Log likelihood = -34.712921
-Iteration 2:  Log likelihood = -34.712921
+Iteration 0:  Log likelihood = -20.571241
+Iteration 1:  Log likelihood = -20.493178
+Iteration 2:  Log likelihood = -20.493175
 Refining estimates:
-Iteration 0:  Log likelihood = -34.712921
+Iteration 0:  Log likelihood = -20.493175
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     12
-Time at risk    = 28,188
-                                                        LR chi2(1)    =   0.06
-Log likelihood = -34.712921                             Prob > chi2   = 0.8115
+No. of failures =      7
+Time at risk    = 33,426
+                                                        LR chi2(1)    =   0.16
+Log likelihood = -20.493175                             Prob > chi2   = 0.6927
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.147814   .6634057     0.24   0.811     .3697427    3.563225
+      hormon |   1.353526   1.042412     0.39   0.694     .2991696    6.123727
 ------------------------------------------------------------------------------
 
 -> silo==16 
@@ -681,25 +684,26 @@ Log likelihood = -34.712921                             Prob > chi2   = 0.8115
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -39.461866
-Iteration 1:  Log likelihood = -39.203342
-Iteration 2:  Log likelihood = -39.202933
-Iteration 3:  Log likelihood = -39.202933
+Iteration 0:  Log likelihood =  -27.67107
+Iteration 1:  Log likelihood = -26.269101
+Iteration 2:  Log likelihood = -26.179516
+Iteration 3:  Log likelihood = -26.177937
+Iteration 4:  Log likelihood = -26.177936
 Refining estimates:
-Iteration 0:  Log likelihood = -39.202933
+Iteration 0:  Log likelihood = -26.177936
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     15
-Time at risk    = 30,791
-                                                        LR chi2(1)    =   0.52
-Log likelihood = -39.202933                             Prob > chi2   = 0.4718
+No. of failures =      9
+Time at risk    = 32,650
+                                                        LR chi2(1)    =   2.99
+Log likelihood = -26.177936                             Prob > chi2   = 0.0840
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .6746967    .375839    -0.71   0.480     .2264372    2.010339
+      hormon |   .2179262   .2312832    -1.44   0.151      .027223    1.744546
 ------------------------------------------------------------------------------
 
 -> silo==17 
@@ -707,23 +711,25 @@ Log likelihood = -39.202933                             Prob > chi2   = 0.4718
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -27.620329
-Iteration 1:  Log likelihood =  -27.62032
+Iteration 0:  Log likelihood = -33.796883
+Iteration 1:  Log likelihood = -33.141948
+Iteration 2:  Log likelihood = -33.136072
+Iteration 3:  Log likelihood = -33.136071
 Refining estimates:
-Iteration 0:  Log likelihood =  -27.62032
+Iteration 0:  Log likelihood = -33.136071
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     11
-Time at risk    = 27,967
-                                                        LR chi2(1)    =   0.00
-Log likelihood = -27.62032                              Prob > chi2   = 0.9965
+No. of failures =     12
+Time at risk    = 26,127
+                                                        LR chi2(1)    =   1.32
+Log likelihood = -33.136071                             Prob > chi2   = 0.2503
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.002686   .6201138     0.00   0.997     .2983577    3.369712
+      hormon |   .4821402   .3224102    -1.09   0.275     .1300078     1.78804
 ------------------------------------------------------------------------------
 
 -> silo==18 
@@ -731,24 +737,24 @@ Log likelihood = -27.62032                              Prob > chi2   = 0.9965
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -37.346618
-Iteration 1:  Log likelihood = -37.230771
-Iteration 2:  Log likelihood = -37.230531
+Iteration 0:  Log likelihood = -32.929709
+Iteration 1:  Log likelihood = -32.509821
+Iteration 2:  Log likelihood = -32.508863
 Refining estimates:
-Iteration 0:  Log likelihood = -37.230531
+Iteration 0:  Log likelihood = -32.508863
 
-Cox regression with Breslow method for ties
+Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     13
-Time at risk    = 32,126
-                                                        LR chi2(1)    =   0.23
-Log likelihood = -37.230531                             Prob > chi2   = 0.6299
+No. of failures =     12
+Time at risk    = 37,367
+                                                        LR chi2(1)    =   0.84
+Log likelihood = -32.508863                             Prob > chi2   = 0.3589
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.321342   .7549915     0.49   0.626     .4311751    4.049271
+      hormon |   1.706313   .9880688     0.92   0.356     .5484747    5.308368
 ------------------------------------------------------------------------------
 
 -> silo==19 
@@ -756,25 +762,24 @@ Log likelihood = -37.230531                             Prob > chi2   = 0.6299
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -37.063732
-Iteration 1:  Log likelihood = -35.097726
-Iteration 2:  Log likelihood = -35.037948
-Iteration 3:  Log likelihood = -35.037938
+Iteration 0:  Log likelihood = -27.315445
+Iteration 1:  Log likelihood = -27.206088
+Iteration 2:  Log likelihood = -27.205948
 Refining estimates:
-Iteration 0:  Log likelihood = -35.037938
+Iteration 0:  Log likelihood = -27.205948
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     13
-Time at risk    = 31,849
-                                                        LR chi2(1)    =   4.05
-Log likelihood = -35.037938                             Prob > chi2   = 0.0441
+No. of failures =     10
+Time at risk    = 34,507
+                                                        LR chi2(1)    =   0.22
+Log likelihood = -27.205948                             Prob > chi2   = 0.6398
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .3180575   .1790951    -2.03   0.042     .1054878    .9589788
+      hormon |   .7208273   .5123172    -0.46   0.645     .1789998    2.902752
 ------------------------------------------------------------------------------
 
 -> silo==20 
@@ -782,25 +787,25 @@ Log likelihood = -35.037938                             Prob > chi2   = 0.0441
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -34.241896
-Iteration 1:  Log likelihood = -32.544607
-Iteration 2:  Log likelihood = -32.540143
-Iteration 3:  Log likelihood = -32.540142
+Iteration 0:  Log likelihood = -37.130941
+Iteration 1:  Log likelihood = -37.045172
+Iteration 2:  Log likelihood = -37.044861
+Iteration 3:  Log likelihood = -37.044861
 Refining estimates:
-Iteration 0:  Log likelihood = -32.540142
+Iteration 0:  Log likelihood = -37.044861
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     12
-Time at risk    = 29,363
-                                                        LR chi2(1)    =   3.40
-Log likelihood = -32.540142                             Prob > chi2   = 0.0651
+No. of failures =     14
+Time at risk    = 30,189
+                                                        LR chi2(1)    =   0.17
+Log likelihood = -37.044861                             Prob > chi2   = 0.6782
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .3079458    .209679    -1.73   0.084     .0810764    1.169644
+      hormon |   1.290067   .7785564     0.42   0.673     .3952857      4.2103
 ------------------------------------------------------------------------------
 
 -> silo==21 
@@ -808,24 +813,24 @@ Log likelihood = -32.540142                             Prob > chi2   = 0.0651
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -31.633602
-Iteration 1:  Log likelihood = -31.402438
-Iteration 2:  Log likelihood = -31.402403
+Iteration 0:  Log likelihood = -35.980943
+Iteration 1:  Log likelihood = -35.978379
+Iteration 2:  Log likelihood = -35.978379
 Refining estimates:
-Iteration 0:  Log likelihood = -31.402403
+Iteration 0:  Log likelihood = -35.978379
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     11
-Time at risk    = 29,560
-                                                        LR chi2(1)    =   0.46
-Log likelihood = -31.402403                             Prob > chi2   = 0.4965
+No. of failures =     12
+Time at risk    = 31,100
+                                                        LR chi2(1)    =   0.01
+Log likelihood = -35.978379                             Prob > chi2   = 0.9429
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .6470203   .4186877    -0.67   0.501     .1820138     2.30002
+      hormon |   1.049302   .7023543     0.07   0.943     .2825828    3.896328
 ------------------------------------------------------------------------------
 
 -> silo==22 
@@ -833,24 +838,24 @@ Log likelihood = -31.402403                             Prob > chi2   = 0.4965
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood =  -29.06295
-Iteration 1:  Log likelihood = -28.654981
-Iteration 2:  Log likelihood = -28.653717
+Iteration 0:  Log likelihood = -33.824466
+Iteration 1:  Log likelihood = -33.801849
+Iteration 2:  Log likelihood = -33.801841
 Refining estimates:
-Iteration 0:  Log likelihood = -28.653717
+Iteration 0:  Log likelihood = -33.801841
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     10
-Time at risk    = 30,452
-                                                        LR chi2(1)    =   0.82
-Log likelihood = -28.653717                             Prob > chi2   = 0.3656
+No. of failures =     12
+Time at risk    = 31,040
+                                                        LR chi2(1)    =   0.05
+Log likelihood = -33.801841                             Prob > chi2   = 0.8315
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   1.783382   1.132815     0.91   0.362     .5135185    6.193451
+      hormon |   .8781277   .5401535    -0.21   0.833     .2630068    2.931895
 ------------------------------------------------------------------------------
 
 -> silo==23 
@@ -858,25 +863,25 @@ Log likelihood = -28.653717                             Prob > chi2   = 0.3656
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -28.209188
-Iteration 1:  Log likelihood = -27.046832
-Iteration 2:  Log likelihood = -27.024215
-Iteration 3:  Log likelihood =  -27.02417
+Iteration 0:  Log likelihood = -37.561775
+Iteration 1:  Log likelihood = -36.937584
+Iteration 2:  Log likelihood = -36.934669
+Iteration 3:  Log likelihood = -36.934669
 Refining estimates:
-Iteration 0:  Log likelihood =  -27.02417
+Iteration 0:  Log likelihood = -36.934669
 
 Cox regression with no ties
 
 No. of subjects =     28                                Number of obs =     28
-No. of failures =     10
-Time at risk    = 34,930
-                                                        LR chi2(1)    =   2.37
-Log likelihood = -27.02417                              Prob > chi2   = 0.1237
+No. of failures =     14
+Time at risk    = 28,968
+                                                        LR chi2(1)    =   1.25
+Log likelihood = -36.934669                             Prob > chi2   = 0.2627
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .3298192   .2612846    -1.40   0.161     .0698151    1.558125
+      hormon |   .5246892   .3137728    -1.08   0.281     .1625061    1.694083
 ------------------------------------------------------------------------------
 
 -> silo==24 
@@ -884,25 +889,25 @@ Log likelihood = -27.02417                              Prob > chi2   = 0.1237
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -28.208613
-Iteration 1:  Log likelihood = -26.144378
-Iteration 2:  Log likelihood =  -26.11557
-Iteration 3:  Log likelihood = -26.115502
+Iteration 0:  Log likelihood = -45.386952
+Iteration 1:  Log likelihood = -44.317251
+Iteration 2:  Log likelihood = -44.258102
+Iteration 3:  Log likelihood = -44.258086
 Refining estimates:
-Iteration 0:  Log likelihood = -26.115502
+Iteration 0:  Log likelihood = -44.258086
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     10
-Time at risk    = 30,725
-                                                        LR chi2(1)    =   4.19
-Log likelihood = -26.115502                             Prob > chi2   = 0.0408
+No. of failures =     16
+Time at risk    = 30,653
+                                                        LR chi2(1)    =   2.26
+Log likelihood = -44.258086                             Prob > chi2   = 0.1329
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |   .2335474   .1860443    -1.83   0.068     .0490124    1.112869
+      hormon |   2.257679   1.170804     1.57   0.116     .8170336    6.238564
 ------------------------------------------------------------------------------
 
 -> silo==25 
@@ -910,24 +915,25 @@ Log likelihood = -26.115502                             Prob > chi2   = 0.0408
         Failure _d: censrec
   Analysis time _t: rectime
 
-Iteration 0:  Log likelihood = -37.030765
-Iteration 1:  Log likelihood = -36.500518
-Iteration 2:  Log likelihood = -36.500087
+Iteration 0:  Log likelihood = -33.737786
+Iteration 1:  Log likelihood = -33.387481
+Iteration 2:  Log likelihood = -33.366767
+Iteration 3:  Log likelihood = -33.366747
 Refining estimates:
-Iteration 0:  Log likelihood = -36.500087
+Iteration 0:  Log likelihood = -33.366747
 
 Cox regression with no ties
 
 No. of subjects =     27                                Number of obs =     27
-No. of failures =     14
-Time at risk    = 24,500
-                                                        LR chi2(1)    =   1.06
-Log likelihood = -36.500087                             Prob > chi2   = 0.3029
+No. of failures =     13
+Time at risk    = 31,611
+                                                        LR chi2(1)    =   0.74
+Log likelihood = -33.366747                             Prob > chi2   = 0.3890
 
 ------------------------------------------------------------------------------
           _t | Haz. ratio   Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      hormon |    .566231   .3190238    -1.01   0.313     .1876778    1.708341
+      hormon |   1.832314   1.218756     0.91   0.363     .4975386    6.747967
 ------------------------------------------------------------------------------
 
 . egen d1 = sum(_d * hormon), by(silo)
@@ -951,32 +957,32 @@ Log likelihood = -36.500087                             Prob > chi2   = 0.3029
 
 . l, noo clean
 
-    silo         b        se   d1   d0   p1   p0  
-       1     0.386     0.608    5    6   10   18  
-       2     0.166     0.666    3   10    7   20  
-       3    -0.282     0.636    4    7   13   15  
-       4     0.084     0.652    3   12    5   22  
-       5    -0.811     0.709    3    7   15   13  
-       6    -1.730     0.580    5   11   12   15  
-       7    -0.225     0.712    3    6    9   19  
-       8    -0.193     0.805    2    9    8   19  
-       9   -36.301   5.6e+07    0    9    4   23  
-      10    -0.763     0.782    2   10    7   21  
-      11     0.263     0.571    5    8    9   18  
-      12     0.813     0.589    6    6    9   19  
-      13     0.370     0.697    3    7    7   20  
-      14   -36.526   3.8e+07    0   16    4   24  
-      15     0.138     0.578    6    6   13   14  
-      16    -0.393     0.557    5   10   10   18  
-      17     0.003     0.618    5    6   10   17  
-      18     0.279     0.571    5    8    9   18  
-      19    -1.146     0.563    6    7   17   11  
-      20    -1.178     0.681    4    8   13   14  
-      21    -0.435     0.647    5    6   13   15  
-      22     0.579     0.635    5    5   10   17  
-      23    -1.109     0.792    2    8   10   18  
-      24    -1.454     0.797    2    8   11   16  
-      25    -0.569     0.563    5    9   11   16  
+    silo        b      se   d1   d0   p1   p0  
+       1    0.482   0.488    8    9   10   18  
+       2   -1.138   1.051    1   10    5   22  
+       3   -0.290   0.622    4    8   10   18  
+       4   -1.367   0.765    2   12    9   18  
+       5   -0.817   0.716    3    7   12   16  
+       6   -0.107   0.561    7    6   15   12  
+       7   -0.731   0.678    4    8   11   17  
+       8   -0.241   0.674    4    5   13   14  
+       9   -0.811   0.822    2    6   10   17  
+      10   -1.143   0.767    2   12    8   20  
+      11   -0.846   0.851    2    6    8   19  
+      12   -0.129   0.585    6    6   14   14  
+      13   -0.218   0.574    4   13    7   20  
+      14   -0.971   0.655    4    7   13   15  
+      15    0.303   0.770    4    3   14   13  
+      16   -1.524   1.061    1    8    9   19  
+      17   -0.730   0.669    3    9    9   18  
+      18    0.534   0.579    6    6    9   18  
+      19   -0.327   0.711    3    7   14   14  
+      20    0.255   0.604    4   10    7   20  
+      21    0.048   0.669    3    9    8   20  
+      22   -0.130   0.615    4    8   10   17  
+      23   -0.645   0.598    4   10    9   19  
+      24    0.814   0.519    6   10    7   20  
+      25    0.606   0.665    3   10    5   22  
 
 . 
 . // two-stage Normal
@@ -991,36 +997,36 @@ using the common-effect inverse-variance model
 --------------------------------------------------------------------
 Study                |   Effect    [95% Conf. Interval]   % Weight
 ---------------------+----------------------------------------------
-1                    |     0.386     -0.807     1.578       4.80
-2                    |     0.166     -1.138     1.471       4.01
-3                    |    -0.282     -1.528     0.965       4.39
-4                    |     0.084     -1.194     1.362       4.18
-5                    |    -0.811     -2.200     0.578       3.54
-6                    |    -1.730     -2.867    -0.593       5.28
-7                    |    -0.225     -1.620     1.170       3.51
-8                    |    -0.193     -1.770     1.384       2.74
-9                    |   -36.301    -1.1e+08   1.1e+08      0.00
-10                   |    -0.763     -2.295     0.769       2.91
-11                   |     0.263     -0.857     1.383       5.44
-12                   |     0.813     -0.342     1.968       5.11
-13                   |     0.370     -0.997     1.737       3.65
-14                   |   -36.526    -7.4e+07   7.4e+07      0.00
-15                   |     0.138     -0.995     1.271       5.32
-16                   |    -0.393     -1.485     0.698       5.73
-17                   |     0.003     -1.209     1.215       4.64
-18                   |     0.279     -0.841     1.399       5.44
-19                   |    -1.146     -2.249    -0.042       5.60
-20                   |    -1.178     -2.512     0.157       3.83
-21                   |    -0.435     -1.704     0.833       4.24
-22                   |     0.579     -0.666     1.823       4.40
-23                   |    -1.109     -2.662     0.443       2.83
-24                   |    -1.454     -3.016     0.107       2.80
-25                   |    -0.569     -1.673     0.536       5.60
+1                    |     0.482     -0.475     1.439       7.24
+2                    |    -1.138     -3.198     0.921       1.56
+3                    |    -0.290     -1.508     0.929       4.47
+4                    |    -1.367     -2.867     0.133       2.95
+5                    |    -0.817     -2.220     0.587       3.37
+6                    |    -0.107     -1.206     0.992       5.49
+7                    |    -0.731     -2.059     0.597       3.76
+8                    |    -0.241     -1.563     1.081       3.80
+9                    |    -0.811     -2.423     0.800       2.55
+10                   |    -1.143     -2.646     0.361       2.93
+11                   |    -0.846     -2.514     0.822       2.38
+12                   |    -0.129     -1.274     1.017       5.05
+13                   |    -0.218     -1.344     0.908       5.23
+14                   |    -0.971     -2.254     0.312       4.03
+15                   |     0.303     -1.207     1.812       2.91
+16                   |    -1.524     -3.604     0.556       1.53
+17                   |    -0.730     -2.040     0.581       3.86
+18                   |     0.534     -0.601     1.669       5.15
+19                   |    -0.327     -1.720     1.066       3.42
+20                   |     0.255     -0.928     1.438       4.74
+21                   |     0.048     -1.264     1.360       3.85
+22                   |    -0.130     -1.336     1.076       4.56
+23                   |    -0.645     -1.817     0.527       4.83
+24                   |     0.814     -0.202     1.831       6.42
+25                   |     0.606     -0.698     1.909       3.90
 ---------------------+----------------------------------------------
-Overall, IV          |    -0.276     -0.537    -0.015     100.00
+Overall, IV          |    -0.211     -0.469     0.046     100.00
 --------------------------------------------------------------------
 
-Test of overall effect = 0:  z =  -2.069  p = 0.039
+Test of overall effect = 0:  z =  -1.607  p = 0.108
 
 
 Heterogeneity measures, calculated from the data
@@ -1028,10 +1034,10 @@ with Conf. Intervals based on non-central chi² (common-effect) distribution for
 ---------------------------------------------------------
 Measure              |     Value      df      p-value
 ---------------------+-----------------------------------
-Cochran's Q          |     25.62       24      0.373
+Cochran's Q          |     21.33       24      0.619
                      |            -[95% Conf. Interval]-
-H                    |     1.033     1.000     1.323
-I² (%)               |      6.3%      0.0%     42.8%
+H                    |     0.943     1.000     1.281
+I² (%)               |      0.0%      0.0%     39.0%
 ---------------------------------------------------------
 H = relative excess in Cochran's Q over its degrees-of-freedom
 I² = proportion of total variation in effect estimate due to between-study heterogeneity (based on Q
@@ -1041,36 +1047,31 @@ I² = proportion of total variation in effect estimate due to between-study hete
 
 . // two-stage Poisson
 . meta2p b se, d(d1 d0) py(p1 p0)
-Found 2 single-zero studies: comparing events/person-years using reported person-years
-Warning: the Poisson approximation mis-weights 3 studies by more than 10%. Consider using the wt
+Warning: the Poisson approximation mis-weights 1 studies by more than 10%. Consider using the wt
   option.
-(2 missing values generated)
 
-  +-----------------------------------------+
-  | __000001      se   se from d     Weight |
-  |-----------------------------------------|
-  |        6   0.580    .5393599   .8640032 |
-  |       20   0.681    .6123725   .8088537 |
-  |       21   0.647    .6055301   .8756425 |
-  +-----------------------------------------+
+  +----------------------------------------+
+  | __000001      se   se from d    Weight |
+  |----------------------------------------|
+  |        7   0.678    .6123725   .816645 |
+  +----------------------------------------+
 Two-stage common-effects meta-analysis by unweighted Poisson approximation:
 ------------------------------------------------------------------------------
         Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      pooled |  -.3970415   .1319188    -3.01   0.003    -.6555977   -.1384854
+      pooled |   -.297404   .1279878    -2.32   0.020    -.5482555   -.0465526
 ------------------------------------------------------------------------------
 
 . frame post res25_11 ("2SP") (r(eff)) (r(se_eff))
 
 . meta2p b se, d(d1 d0) py(p1 p0) wt
-Found 2 single-zero studies: comparing events/person-years using reported person-years
-Note: the Poisson approximation would mis-weight 3 studies by more than 10%. The wt option will
+Note: the Poisson approximation would mis-weight 1 studies by more than 10%. The wt option will
   correct this.
 Two-stage common-effects meta-analysis by weighted Poisson approximation:
 ------------------------------------------------------------------------------
         Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
 -------------+----------------------------------------------------------------
-      pooled |  -.3793864   .1343971    -2.82   0.005    -.6427999   -.1159729
+      pooled |  -.2907023   .1298436    -2.24   0.025    -.5451911   -.0362136
 ------------------------------------------------------------------------------
 
 . frame post res25_11 ("2SPW") (r(eff)) (r(se_eff))
@@ -1079,15 +1080,16 @@ Two-stage common-effects meta-analysis by weighted Poisson approximation:
 . frame res25_11: l, noo clean
 
     method           b         se  
-        1S   -.3638988   .1250441  
-       2SN   -.2757793   .1332866  
-       2SP   -.3970415   .1319188  
-      2SPW   -.3793864   .1343971  
+      1Sun   -.3638988   .1250441  
+      1Sad   -.3276693   .1287229  
+       2SN   -.2112179   .1314011  
+       2SP    -.297404   .1279878  
+      2SPW   -.2907023   .1298436  
 
 . 
 . log close
       name:  <unnamed>
        log:  C:\ian\git\TwoStagePoisson\brcancer\siloes.log
   log type:  text
- closed on:   9 Apr 2026, 17:06:55
+ closed on:  28 May 2026, 09:56:23
 ----------------------------------------------------------------------------------------------------

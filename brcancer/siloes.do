@@ -1,7 +1,11 @@
 /*
 siloes.do
+Multiply split the German breast cancer data set into siloes, 
+	analyse by IPD MA,
+	and compare meta2p with metan for one of the splits
 IW 23jan2026
 minor revision 9apr2026, 24apr2026
+bug fix to make the data splits reproducible, 28may2026
 */
 
 // User-specific settings
@@ -34,8 +38,9 @@ foreach siloes in 2 5 10 25 {
 		if `rep'==1 _dots 0, title("`siloes' siloes: simulation running (`reps' repetitions)")
 		_dots `rep' 0
 		cap drop random silo
-		gen random = runiform()
-		sort random
+		sort id // restore original sort order
+		gen double random = runiform() // double is included to make ties much less likely
+		sort random id // id is included in order to sort consistently not arbitrarily, in the unlikely event of a tie on random
 		gen silo = int(`siloes'*(_n-1)/_N)+1
 		qui ipdmetan, study(silo) nograph: stcox hormon
 		frame post results (`siloes') (`rep') (r(eff)) (r(se_eff))
@@ -70,7 +75,11 @@ cap frame drop res25_11
 frame create res25_11 str4 method b se
 // one-stage
 stcox hormon, nohr
-frame post res25_11 ("1S") (_b[hormon]) (_se[hormon])
+frame post res25_11 ("1Sun") (_b[hormon]) (_se[hormon])
+
+// one-stage
+stcox hormon i.silo, nohr
+frame post res25_11 ("1Sadj") (_b[hormon]) (_se[hormon])
 
 tab silo hormon if _d
 byvar silo, b(hormon) se(hormon) unique gen: stcox hormon
