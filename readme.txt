@@ -45,3 +45,6 @@ Outputs
 	twoSPsimrun.log - main results
 	twoSPcombine.dta - combined data set
 	twoSPsimresults.log
+Notes
+	The command metafish had the earlier name of meta2p when the simulation was run. Similarly, the repository metafish was previously called TwoStagePoisson. Both names have been changed by editing the do files and the log files.
+	"twoSP" in the file names reflects an earlier concept of the Poisson approximation method as a two-stage meta-analysis method, while we now present it as an aggregate data meta-analysis method.
