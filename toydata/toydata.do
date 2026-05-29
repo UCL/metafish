@@ -6,8 +6,8 @@ minor revision 9apr2026
 */
 
 // User-specific settings
-cd C:\ian\git\TwoStagePoisson\toydata
-adopath ++ C:\ian\git\TwoStagePoisson\ado
+cd C:\ian\git\metafish\toydata
+adopath ++ C:\ian\git\metafish\ado
 set scheme mrc
 
 version 18

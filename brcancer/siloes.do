@@ -9,8 +9,8 @@ bug fix to make the data splits reproducible, 28may2026
 */
 
 // User-specific settings
-cd C:\ian\git\TwoStagePoisson\brcancer
-adopath ++ C:\ian\git\TwoStagePoisson\ado
+cd C:\ian\git\metafish\brcancer
+adopath ++ C:\ian\git\metafish\ado
 set scheme mrc
 
 version 18

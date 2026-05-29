@@ -1,15 +1,15 @@
 ----------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\brcancer\siloes.log
+       log:  C:\ian\git\metafish\brcancer\siloes.log
   log type:  text
- opened on:  28 May 2026, 19:41:25
+ opened on:  29 May 2026, 18:43:24
 
 . 
 . version
 version 18.0
 
-. which meta2p
-C:\ian\git\TwoStagePoisson\ado\meta2p.ado
+. which metafish
+C:\ian\git\metafish\ado\metafish.ado
 *! v0.6 IW 9apr2026
 
 . 
@@ -114,6 +114,7 @@ Log likelihood = -1783.765                              Prob > chi2   = 0.0030
 ..................................................    50
 
 . 
+. // Table 4 for paper: average logHR and SE across splits
 . frame results {
 .         sort siloes rep
 .         label val siloes siloes
@@ -137,6 +138,7 @@ siloes2 |
 . }
 
 . 
+. // Figure 2 for paper: SE vs logHR across splits
 . frame results : ///
 >         scatter se b if rep==0, ms(X) msize(*2) ///
 >         || scatter se b if rep>0, /*mlab(rep)*/ ms(oh) ///
@@ -940,6 +942,8 @@ Log likelihood = -31.177147                             Prob > chi2   = 0.7860
 
 . format b se %6.3f
 
+. 
+. // Table 5 for paper: the selected data set
 . l, noo clean
 
     silo        b      se   d1   d0   p1   p0  
@@ -1031,7 +1035,7 @@ I² = proportion of total variation in effect estimate due to between-study hete
 . frame post res25_12 ("2SN") (r(eff)) (r(se_eff))
 
 . // two-stage Poisson
-. meta2p b se, d(d1 d0) py(p1 p0)
+. metafish b se, d(d1 d0) py(p1 p0)
 Warning: the Poisson approximation mis-weights 1 studies by more than 10%. Consider using the wt
   option.
 
@@ -1049,7 +1053,7 @@ Two-stage common-effects meta-analysis by unweighted Poisson approximation:
 
 . frame post res25_12 ("2SP") (r(eff)) (r(se_eff))
 
-. meta2p b se, d(d1 d0) py(p1 p0) wt
+. metafish b se, d(d1 d0) py(p1 p0) wt
 Note: the Poisson approximation would mis-weight 1 studies by more than 10%. The wt option will
   correct this.
 Two-stage common-effects meta-analysis by weighted Poisson approximation:
@@ -1074,7 +1078,7 @@ Two-stage common-effects meta-analysis by weighted Poisson approximation:
 . 
 . log close
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\brcancer\siloes.log
+       log:  C:\ian\git\metafish\brcancer\siloes.log
   log type:  text
- closed on:  28 May 2026, 19:42:03
+ closed on:  29 May 2026, 18:43:58
 ----------------------------------------------------------------------------------------------------

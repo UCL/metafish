@@ -1,15 +1,15 @@
 ----------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\toydata\toydata.log
+       log:  C:\ian\git\metafish\toydata\toydata.log
   log type:  text
- opened on:   9 Apr 2026, 16:57:34
+ opened on:  29 May 2026, 18:42:16
 
 . 
 . version
 version 18.0
 
-. which meta2p
-C:\ian\git\TwoStagePoisson\ado\meta2p.ado
+. which metafish
+C:\ian\git\metafish\ado\metafish.ado
 *! v0.6 IW 9apr2026
 
 . 
@@ -172,7 +172,7 @@ file toydata_pllf.gph saved
 . 
 . log close
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\toydata\toydata.log
+       log:  C:\ian\git\metafish\toydata\toydata.log
   log type:  text
- closed on:   9 Apr 2026, 16:57:59
+ closed on:  29 May 2026, 18:42:56
 ----------------------------------------------------------------------------------------------------
