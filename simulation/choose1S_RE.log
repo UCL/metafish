@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\simulation\choose1S_RE.log
+       log:  C:\ian\git\metafish\simulation\choose1S_RE.log
   log type:  text
  opened on:  25 Feb 2026, 19:32:54
 
@@ -33,11 +33,11 @@
 > */
 . 
 . // User-specific settings
-. cd C:\ian\git\TwoStagePoisson\simulation
-C:\ian\git\TwoStagePoisson\simulation
+. cd C:\ian\git\metafish\simulation
+C:\ian\git\metafish\simulation
 
-. adopath ++ C:\ian\git\TwoStagePoisson\ado
-  [1]              "C:\ian\git\TwoStagePoisson\ado"
+. adopath ++ C:\ian\git\metafish\ado
+  [1]              "C:\ian\git\metafish\ado"
   [2]  (BASE)      "C:\Program Files\StataNow19\ado\base/"
   [3]  (SITE)      "C:\Program Files\StataNow19\ado\site/"
   [4]              "."
@@ -226,7 +226,7 @@ C:\ian\git\TwoStagePoisson\simulation
  43. 
 . * CE method 3: 2-stage Poisson, unweighted
 . timer on 3
- 44. cap meta2p b se, d(d1 d0) py(p1 p0) study(study)
+ 44. cap metafish b se, d(d1 d0) py(p1 p0) study(study)
  45. timer off 3
  46. if _rc==1 exit 1
  47. if _rc==0 {
@@ -239,7 +239,7 @@ C:\ian\git\TwoStagePoisson\simulation
  54. 
 . * CE method 4: 2-stage Poisson, weighted
 . timer on 4
- 55. cap meta2p b se, d(d1 d0) py(p1 p0) study(study) wt
+ 55. cap metafish b se, d(d1 d0) py(p1 p0) study(study) wt
  56. timer off 4
  57. if _rc==1 exit 1
  58. if _rc==0 {
@@ -278,7 +278,7 @@ C:\ian\git\TwoStagePoisson\simulation
  87. 
 . * RE method 7: 2-stage Poisson, unweighted
 . timer on 7
- 88. cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re 
+ 88. cap metafish b se, d(d1 d0) py(p1 p0) study(study) re 
  89. timer off 7
  90. if _rc==1 exit 1
  91. if _rc==0 {
@@ -291,7 +291,7 @@ C:\ian\git\TwoStagePoisson\simulation
  98. 
 . * RE method 8: 2-stage Poisson, weighted
 . timer on 8
- 99. cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re wt
+ 99. cap metafish b se, d(d1 d0) py(p1 p0) study(study) re wt
 100. timer off 8
 101. if _rc==1 exit 1
 102. if _rc==0 {
@@ -304,7 +304,7 @@ C:\ian\git\TwoStagePoisson\simulation
 109. 
 . * RE method 9: 2-stage Poisson, unweighted, centred
 . timer on 9
-110. cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re centre
+110. cap metafish b se, d(d1 d0) py(p1 p0) study(study) re centre
 111. timer off 9
 112. if _rc==1 exit 1
 113. if _rc==0 {
@@ -317,7 +317,7 @@ C:\ian\git\TwoStagePoisson\simulation
 120. 
 . * RE method 10: 2-stage Poisson, weighted, centred
 . timer on 10
-121. cap meta2p b se, d(d1 d0) py(p1 p0) study(study) re wt centre
+121. cap metafish b se, d(d1 d0) py(p1 p0) study(study) re wt centre
 122. timer off 10
 123. if _rc==1 exit 1
 124. if _rc==0 {
@@ -2728,7 +2728,7 @@ study:       |
 . 
 end of do-file
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\simulation\choose1S_RE.log
+       log:  C:\ian\git\metafish\simulation\choose1S_RE.log
   log type:  text
  closed on:  25 Feb 2026, 20:18:34
 -------------------------------------------------------------------------------------

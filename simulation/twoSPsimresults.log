@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\simulation\twoSPsimresults.log
+       log:  C:\ian\git\metafish\simulation\twoSPsimresults.log
   log type:  text
  opened on:  24 Apr 2026, 18:18:18
 
@@ -1052,7 +1052,7 @@ gamma             |
 . 
 end of do-file
       name:  <unnamed>
-       log:  C:\ian\git\TwoStagePoisson\simulation\twoSPsimresults.log
+       log:  C:\ian\git\metafish\simulation\twoSPsimresults.log
   log type:  text
  closed on:  24 Apr 2026, 18:19:13
 ------------------------------------------------------------------------------------------------------------------------

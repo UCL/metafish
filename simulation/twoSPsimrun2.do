@@ -10,8 +10,8 @@ IW 25feb2026
 */
 
 // User-specific settings
-cd C:\ian\git\TwoStagePoisson\simulation
-adopath ++ C:\ian\git\TwoStagePoisson\ado
+cd C:\ian\git\metafish\simulation
+adopath ++ C:\ian\git\metafish\ado
 set scheme mrc
 
 // SET UP DGMS
