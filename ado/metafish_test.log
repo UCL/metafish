@@ -1,10 +1,10 @@
 
-. which meta2p
-C:\ian\git\TwoStagePoisson\ado\meta2p.ado
+. which metafish
+.\metafish.ado
 *! v0.6 IW 9apr2026
 
 . 
-. // Toy data: show meta2p reproduces 1-stage Poisson
+. // Toy data: show metafish reproduces 1-stage Poisson
 . 
 . clear
 
@@ -100,7 +100,7 @@ I² = proportion of total variation in effect estimate due to between-study hete
 > )
 
 . 
-. meta2p est se, d(d1 d0) 
+. metafish est se, d(d1 d0) 
 Two-stage common-effects meta-analysis by unweighted Poisson approximation:
 ------------------------------------------------------------------------------
         Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
@@ -108,16 +108,18 @@ Two-stage common-effects meta-analysis by unweighted Poisson approximation:
       pooled |  -.3566749   .1558387    -2.29   0.022    -.6621133   -.0512366
 ------------------------------------------------------------------------------
 
-. assert abs(r(eff)-`true')<1E-10
+. mytest r(eff) `true'
+-.35667494 -.35667494
 
-. assert abs(r(se_eff)-`truese')<1E-10
+. mytest r(se_eff) `truese'
+.15583874 .15583874
 
 . 
 . // Reversing groups gives same answer (reversed)
 . 
 . gen negest = -est
 
-. meta2p negest se, d(d0 d1) 
+. metafish negest se, d(d0 d1) 
 Two-stage common-effects meta-analysis by unweighted Poisson approximation:
 ------------------------------------------------------------------------------
         Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
@@ -125,15 +127,17 @@ Two-stage common-effects meta-analysis by unweighted Poisson approximation:
       pooled |   .3566749   .1558387     2.29   0.022     .0512366    .6621133
 ------------------------------------------------------------------------------
 
-. assert abs(-r(eff)-`true')<1E-10
+. mytest r(eff) -`true'
+.35667494 .35667494
 
-. assert abs(r(se_eff)-`truese')<1E-10
+. mytest r(se_eff) `truese'
+.15583874 .15583874
 
 . 
 . // Check that options run
 . 
-. meta2p est se, d(d1 d0) study(study) py(py1 py0) wt centre verb list irr eform re poissonopt(nohea
-> der intpoints(5)) wttol(20)
+. metafish est se, d(d1 d0) study(study) py(py1 py0) wt centre verb list irr eform re poissonopt(noh
+> eader intpoints(5)) wttol(20)
 Data for Poisson model:
      +--------------------------------------------+
      | study   Group   Events   Pyears     Weight |
@@ -185,8 +189,9 @@ Two-stage random-effects meta-analysis by weighted Poisson approximation:
        tausq |   1.466769   .6700493     0.84   0.402     .5991229    3.590935
 ------------------------------------------------------------------------------
 
-. meta2p est se, d(d1 d0) study(study) py(py1 py0) wt centre verb list irr eform poissonopt(robust) 
-> wttol(50)
+. 
+. metafish est se, d(d1 d0) study(study) py(py1 py0) wt centre verb list irr eform poissonopt(robust
+> ) wttol(50)
 Data for Poisson model:
      +--------------------------------------------+
      | study   Group   Events   Pyears     Weight |
@@ -226,7 +231,7 @@ Two-stage common-effects meta-analysis by weighted Poisson approximation:
 . * robust isn't allowed with mepoisson
 . 
 . // se not required if no wt
-. meta2p est, d(d1 d0) 
+. metafish est, d(d1 d0) 
 Two-stage common-effects meta-analysis by unweighted Poisson approximation:
 ------------------------------------------------------------------------------
         Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
@@ -234,10 +239,137 @@ Two-stage common-effects meta-analysis by unweighted Poisson approximation:
       pooled |  -.3566749   .1558387    -2.29   0.022    -.6621133   -.0512366
 ------------------------------------------------------------------------------
 
-. cap noi meta2p est, d(d1 d0) wt
+. cap noi metafish est, d(d1 d0) wt
 se required with the wt option
 
 . assert _rc==198
+
+. 
+. // Now test on a larger data set
+. use ..\brcancer\siloes25_12_meta, clear
+(German breast cancer data summarised across 25 siloes (rep 12))
+
+. metafish b se, d(d1 d0) study(silo) py(p1 p0) wt centre re
+Note: the Poisson approximation would mis-weight 1 studies by more than 10%. The wt option will
+  correct this.
+Two-stage random-effects meta-analysis by weighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |  -.3143857   .1290513    -2.44   0.015    -.5673215   -.0614499
+       tausq |   6.01e-31   2.09e-15     0.00   1.000    -4.10e-15    4.10e-15
+------------------------------------------------------------------------------
+
+. local b = r(eff)
+
+. local se = r(se_eff)
+
+. 
+. * test same answers with different sort order
+. sort b
+
+. metafish b se, d(d1 d0) study(silo) py(p1 p0) wt centre re
+Note: the Poisson approximation would mis-weight 1 studies by more than 10%. The wt option will
+  correct this.
+Two-stage random-effects meta-analysis by weighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |  -.3143857   .1290513    -2.44   0.015    -.5673215   -.0614499
+       tausq |   6.01e-31   2.09e-15     0.00   1.000    -4.10e-15    4.10e-15
+------------------------------------------------------------------------------
+
+. mytest `b' r(eff)
+-.31438572 -.31438572
+
+. mytest `se' r(se_eff)
+.12905126 .12905126
+
+. 
+. * test same answers with different variable names
+. rename (*) (z*)
+
+. metafish zb zse, d(zd1 zd0) study(zsilo) py(zp1 zp0) wt centre re
+Note: the Poisson approximation would mis-weight 1 studies by more than 10%. The wt option will
+  correct this.
+Two-stage random-effects meta-analysis by weighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |  -.3143857   .1290513    -2.44   0.015    -.5673215   -.0614499
+       tausq |   6.01e-31   2.09e-15     0.00   1.000    -4.10e-15    4.10e-15
+------------------------------------------------------------------------------
+
+. mytest `b' r(eff)
+-.31438572 -.31438572
+
+. mytest `se' r(se_eff)
+.12905126 .12905126
+
+. 
+. use ..\brcancer\siloes25_12_meta, clear
+(German breast cancer data summarised across 25 siloes (rep 12))
+
+. metafish b se, d(d1 d0) study(silo) py(p1 p0) 
+Warning: the Poisson approximation mis-weights 1 studies by more than 10%. Consider using the wt
+  option.
+
+  +-------------------------------------+
+  | silo      se   se from d     Weight |
+  |-------------------------------------|
+  |   24   0.678    .6123725   .8167152 |
+  +-------------------------------------+
+Two-stage common-effects meta-analysis by unweighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |   -.318935   .1271536    -2.51   0.012    -.5681515   -.0697185
+------------------------------------------------------------------------------
+
+. local b = r(eff)
+
+. local se = r(se_eff)
+
+. 
+. * test analogous answers with data multiplied by 4 (CE model only)
+. for var d? p?: replace X=X*4
+
+->  replace d1=d1*4
+(25 real changes made)
+
+->  replace d0=d0*4
+(25 real changes made)
+
+->  replace p1=p1*4
+(25 real changes made)
+
+->  replace p0=p0*4
+(25 real changes made)
+
+. replace se=se/2
+(25 real changes made)
+
+. metafish b se, d(d1 d0) study(silo) py(p1 p0)
+Warning: the Poisson approximation mis-weights 1 studies by more than 10%. Consider using the wt
+  option.
+
+  +-------------------------------------+
+  | silo      se   se from d     Weight |
+  |-------------------------------------|
+  |   24   0.339    .3061862   .8167152 |
+  +-------------------------------------+
+Two-stage common-effects meta-analysis by unweighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |   -.318935   .0635768    -5.02   0.000    -.4435432   -.1943267
+------------------------------------------------------------------------------
+
+. mytest `b' r(eff)
+-.31893497 -.31893497
+
+. mytest `se'/2 r(se_eff)
+.0635768 .0635768
 
 . 
 . log close

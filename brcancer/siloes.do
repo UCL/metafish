@@ -99,6 +99,8 @@ keep silo B S d? p?
 rename B b
 rename S se
 format b se %6.3f
+label data "German breast cancer data summarised across 25 siloes (rep 12)"
+save siloes25_12_meta, replace
 
 // Table 5 for paper: the selected data set
 l, noo clean
