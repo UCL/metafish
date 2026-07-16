@@ -6,8 +6,8 @@ Code author: Ian White
 
 Paper authors: Ian White, Becky Turner, Richard Riley, David Fisher 
 
-The paper will shortly be submitted to Research Synthesis Methods
+The paper was submitted to Research Synthesis Methods on 1jun2026
 
-Date: 29may2026
+Date: 1jun2026
 
 See readme.txt for the structure of the repository.
