@@ -36,7 +36,7 @@
 {synopt:{opt re}}Fit random-effects model. Default is a common-effect model.{p_end}
 {synopt:{opt cen:tre}}Centre the treatment covariate.{p_end}
 {synopt:{opt verb:ose}}Show the output of the Poisson regression.{p_end}
-{synopt:{opt pause}}Pause before the Poisson regression. Useful for understanding errors.{p_end}
+{synopt:{opt pause}}Pause before the Poisson regression (if {help pause} is on). Useful for understanding errors.{p_end}
 {synopt:{opt list}}Summarise Poisson data before fitting Poisson model.{p_end}
 {synopt:{opt irr}}Report exponentiated coefficient (incidence rate ratio). Same as eform.{p_end}
 {synopt:{opt eform}}Report exponentiated coefficient (incidence rate ratio). Same as irr.{p_end}
@@ -98,7 +98,7 @@ then a warning is printed and the deviating studies are listed. If {cmd:wt} is s
 
 {phang}. {stata "clear"}{p_end}
 {phang}. {stata "input study d1 py1 d0 py0"}{p_end}
-{phang}{space 4}{stata "1 40 1000 10 1000"}{p_end}
+{phang}{space 4}{stata "1 10 1000 40 1000"}{p_end}
 {phang}{space 4}{stata "2 60 1000 60 1000"}{p_end}
 {phang}{space 4}{stata "end"}{p_end}
 

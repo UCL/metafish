@@ -1,5 +1,9 @@
 /*
-*! v0.6 IW 9apr2026
+*! v0.6.2 IW 7aug2026
+	new clear option
+* v0.6.1 IW 4aug2026
+	add random as synonym for re
+* v0.6 IW 9apr2026
 	SE is not required if wt not specified.
 	Weights are checked against new wttolerance
 v0.5.1 IW 17feb2026
@@ -17,9 +21,9 @@ prog def metafish, rclass
 * run 2-stage Poisson-approx MA (CE and RE)
 * NB b is assumed to be a log HR or log RR for group 1 vs group 2
 syntax varlist(min=1 max=2) [if] [in], d(varlist min=2 max=2) [Study(varname) ///
-	PYears(varlist min=2 max=2) wt RE CENtre VERBose pause list irr eform ///
+	PYears(varlist min=2 max=2) wt RE RANdom CENtre VERBose pause list irr eform ///
 	POISSONoptions(string) WTTOLerance(real 10) ///
-	debug /// undocumented
+	debug clear /// undocumented
 	]
 local est : word 1 of `varlist'
 local se : word 2 of `varlist'
@@ -31,6 +35,7 @@ local d1 : word 1 of `d'
 local d0 : word 2 of `d'
 if !mi("`verbose'") local noi noi
 if !mi("`irr'") local eform eform
+if !mi("`random'") local re re // random is a synonym for re
 * END OF PARSING
 
 preserve
@@ -39,6 +44,7 @@ qui keep if `touse'
 if missing("`study'") {
 	tempvar study
 	gen `study'=_n
+	char `study'[varname] "Study"
 }
 
 qui count if max(`d0',`d1')==0
@@ -91,8 +97,10 @@ if !mi("`se'") {
 			tempvar sefromd
 			gen `sefromd' = sqrt(1/`d'1+1/`d'0)
 			char `sefromd'[varname] "se from d"
+			di as error "Studies affected:" _c
 			l `study' `se' `sefromd' `wtvar' if (`wtvar'>1+`wttolerance'/100 | `wtvar'<1-`wttolerance'/100) ///
 				& !mi(`wtvar'), subvarname abb(9) noo
+			di
 		}
 	}
 }
@@ -109,7 +117,7 @@ local poissoncmd poisson Meta pooled i.`study' `wtexp', exp(`exp')
 if !mi("`re'") local poissoncmd me`poissoncmd' || `study':pooled, nocons
 local poissoncmd `poissoncmd' `poissonoptions'
 if !mi("`list'") {
-	di as text "Data for Poisson model:" _c
+	di as text "Pseudo-data for Poisson model:" _c
 	char `exp'[varname] "Pyears"
 	char pooled[varname] "Group"
 	char Meta[varname] "Events"
@@ -132,9 +140,9 @@ if `error' {
 }
 
 // Display results
-local model = cond(mi("`re'"),"common","random")
+local model = cond(mi("`re'"),"common-effect","random-effects")
 local weighting = cond(mi("`wt'"),"unweighted","weighted")
-di as text "Two-stage `model'-effects meta-analysis by `weighting' Poisson approximation:" _c
+di as text "Two-stage `model' meta-analysis by `weighting' Poisson approximation:" _c
 if !mi("`re'") local nlcom2 (tausq:_b[/var(pooled[`study'])])
 nlcom (pooled:_b[pooled]) `nlcom2', noheader `eform'
 
@@ -145,5 +153,21 @@ return scalar eff = b[1,"pooled"]
 return scalar se_eff = sqrt(V["pooled","pooled"])
 if !mi("`re'") return scalar tausq = b[1,"tausq"]
 return scalar error = `error'
-end
 
+if !mi("`clear'") {
+	restore, not
+	if !mi("`wtexp'") {
+		rename `wtvar' Weight
+		local wtexp [iweight=Weight]
+		local keepvar Weight
+	}
+	rename (Meta pooled `study' `exp') (Events Treat Study Pyears)
+	keep Events Treat Study Pyears `keepvar'
+	local poissoncmd poisson Events Treat i.Study `wtexp', exp(Pyears)
+	if !mi("`re'") local poissoncmd me`poissoncmd' || Study:Treat, nocons
+	local poissoncmd `poissoncmd' `poissonoptions'
+	global F9 `poissoncmd'
+	di as text "Pseudo-data are now in memory, and Poisson command is in F9"
+}
+
+end
