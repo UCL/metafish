@@ -10,6 +10,7 @@ cd C:\ian\git\metafish\toydata
 adopath ++ C:\ian\git\metafish\ado
 set scheme mrc
 
+prog drop _all
 version 18
 cap log close
 set linesize 100
@@ -18,8 +19,50 @@ log using toydata, text replace
 version
 which metafish
 
+// Two-stage analyses
+use toydata, clear
+reshape wide d py, i(study) j(z)
+gen est = log(d1/py1) - log(d0/py0)
+gen se = sqrt(1/d1+1/d0)
+
+* perpare to store results in other frame
+frame change default
+cap frame drop examples
+frame create examples str8 method b se
+
+* Poisson-approximation method
+metafish est se, d(d1 d0) 
+frame post examples ("Poisson") (r(eff)) (r(se_eff))
+
+* Normal-approximation method
+metan est se, nograph model(fixed)
+frame post examples ("Normal") (r(eff)) (r(se_eff))
+
+* Normal-approximation method with bias correction
+gen estbc = log((d1+0.5)/py1) - log((d0+0.5)/py0)
+gen sebc1 = sqrt(1/(d1+0.5)+1/(d0+0.5))
+gen sebc2 = sqrt(d1/(d1+0.5)^2+d0/(d0+0.5)^2)
+metan estbc sebc1, nograph model(fixed)
+frame post examples ("N-BC-1") (r(eff)) (r(se_eff))
+* both SEs decrease, but that of study 1 decreases more (sparser)
+
+metan estbc sebc2, nograph model(fixed)
+* both SEs decrease, but that of study 1 decreases more (sparser)
+frame post examples ("N-BC-2") (r(eff)) (r(se_eff))
+
+frame examples {
+	gen lci = b - invnorm(.975)*se
+	gen uci = b + invnorm(.975)*se
+	gen rr = exp(b)
+	gen rrlci = exp(lci)
+	gen rruci = exp(uci)
+	l method b lci uci rr*
+	format b se lci uci %6.3f
+	format rr* %6.2f
+	l method b lci uci rr*
+}
+
 // Compute PLLFs: a bit slow
-prog drop _all
 use toydata, clear
 forvalues i=1/2 {
 	poisson d z if study==`i', exposure(py) 

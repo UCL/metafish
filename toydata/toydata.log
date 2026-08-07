@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\ian\git\metafish\toydata\toydata.log
   log type:  text
- opened on:  29 May 2026, 18:42:16
+ opened on:   7 Aug 2026, 18:35:59
 
 . 
 . version
@@ -10,12 +10,203 @@ version 18.0
 
 . which metafish
 C:\ian\git\metafish\ado\metafish.ado
-*! v0.6 IW 9apr2026
+*! v0.6.1 IW 4aug2026
+
+. 
+. // Two-stage analyses
+. use toydata, clear
+
+. reshape wide d py, i(study) j(z)
+(j = 0 1)
+
+Data                               Long   ->   Wide
+-----------------------------------------------------------------------------
+Number of observations                4   ->   2           
+Number of variables                   4   ->   5           
+j variable (2 values)                 z   ->   (dropped)
+xij variables:
+                                      d   ->   d0 d1
+                                     py   ->   py0 py1
+-----------------------------------------------------------------------------
+
+. gen est = log(d1/py1) - log(d0/py0)
+
+. gen se = sqrt(1/d1+1/d0)
+
+. 
+. * perpare to store results in other frame
+. frame change default
+
+. cap frame drop examples
+
+. frame create examples str8 method b se
+
+. 
+. * Poisson-approximation method
+. metafish est se, d(d1 d0) 
+Two-stage common-effect meta-analysis by unweighted Poisson approximation:
+------------------------------------------------------------------------------
+        Meta | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+      pooled |  -.3566749   .1558387    -2.29   0.022    -.6621133   -.0512366
+------------------------------------------------------------------------------
+
+. frame post examples ("Poisson") (r(eff)) (r(se_eff))
+
+. 
+. * Normal-approximation method
+. metan est se, nograph model(fixed)
+
+Studies included: 2
+Participants included: Unknown
+
+Meta-analysis pooling of aggregate data
+using the common-effect inverse-variance model
+
+--------------------------------------------------------------------
+Study                |   Effect    [95% Conf. Interval]   % Weight
+---------------------+----------------------------------------------
+1                    |    -1.386     -2.079    -0.693      21.05
+2                    |     0.000     -0.358     0.358      78.95
+---------------------+----------------------------------------------
+Overall, IV          |    -0.292     -0.610     0.026     100.00
+--------------------------------------------------------------------
+
+Test of overall effect = 0:  z =  -1.799  p = 0.072
+
+
+Heterogeneity measures, calculated from the data
+with Conf. Intervals based on non-central chi² (common-effect) distribution for Q
+---------------------------------------------------------
+Measure              |     Value      df      p-value
+---------------------+-----------------------------------
+Cochran's Q          |     12.14        1      0.000
+                     |            -[95% Conf. Interval]-
+H                    |     3.484     1.377     5.297
+I² (%)               |     91.8%     47.3%     96.4%
+---------------------------------------------------------
+H = relative excess in Cochran's Q over its degrees-of-freedom
+I² = proportion of total variation in effect estimate due to between-study heterogeneity (based on Q
+> )
+
+. frame post examples ("Normal") (r(eff)) (r(se_eff))
+
+. 
+. * Normal-approximation method with bias correction
+. gen estbc = log((d1+0.5)/py1) - log((d0+0.5)/py0)
+
+. gen sebc1 = sqrt(1/(d1+0.5)+1/(d0+0.5))
+
+. gen sebc2 = sqrt(d1/(d1+0.5)^2+d0/(d0+0.5)^2)
+
+. metan estbc sebc1, nograph model(fixed)
+
+Studies included: 2
+Participants included: Unknown
+
+Meta-analysis pooling of aggregate data
+using the common-effect inverse-variance model
+
+--------------------------------------------------------------------
+Study                |   Effect    [95% Conf. Interval]   % Weight
+---------------------+----------------------------------------------
+1                    |    -1.350     -2.029    -0.671      21.61
+2                    |     0.000     -0.356     0.356      78.39
+---------------------+----------------------------------------------
+Overall, IV          |    -0.292     -0.607     0.024     100.00
+--------------------------------------------------------------------
+
+Test of overall effect = 0:  z =  -1.812  p = 0.070
+
+
+Heterogeneity measures, calculated from the data
+with Conf. Intervals based on non-central chi² (common-effect) distribution for Q
+---------------------------------------------------------
+Measure              |     Value      df      p-value
+---------------------+-----------------------------------
+Cochran's Q          |     11.91        1      0.001
+                     |            -[95% Conf. Interval]-
+H                    |     3.451     1.343     5.263
+I² (%)               |     91.6%     44.6%     96.4%
+---------------------------------------------------------
+H = relative excess in Cochran's Q over its degrees-of-freedom
+I² = proportion of total variation in effect estimate due to between-study heterogeneity (based on Q
+> )
+
+. frame post examples ("N-BC-1") (r(eff)) (r(se_eff))
+
+. * both SEs decrease, but that of study 1 decreases more (sparser)
+. 
+. metan estbc sebc2, nograph model(fixed)
+
+Studies included: 2
+Participants included: Unknown
+
+Meta-analysis pooling of aggregate data
+using the common-effect inverse-variance model
+
+--------------------------------------------------------------------
+Study                |   Effect    [95% Conf. Interval]   % Weight
+---------------------+----------------------------------------------
+1                    |    -1.350     -2.015    -0.685      22.17
+2                    |     0.000     -0.355     0.355      77.83
+---------------------+----------------------------------------------
+Overall, IV          |    -0.299     -0.612     0.014     100.00
+--------------------------------------------------------------------
+
+Test of overall effect = 0:  z =  -1.874  p = 0.061
+
+
+Heterogeneity measures, calculated from the data
+with Conf. Intervals based on non-central chi² (common-effect) distribution for Q
+---------------------------------------------------------
+Measure              |     Value      df      p-value
+---------------------+-----------------------------------
+Cochran's Q          |     12.32        1      0.000
+                     |            -[95% Conf. Interval]-
+H                    |     3.510     1.405     5.325
+I² (%)               |     91.9%     49.3%     96.5%
+---------------------------------------------------------
+H = relative excess in Cochran's Q over its degrees-of-freedom
+I² = proportion of total variation in effect estimate due to between-study heterogeneity (based on Q
+> )
+
+. * both SEs decrease, but that of study 1 decreases more (sparser)
+. frame post examples ("N-BC-2") (r(eff)) (r(se_eff))
+
+. 
+. frame examples {
+.         gen lci = b - invnorm(.975)*se
+.         gen uci = b + invnorm(.975)*se
+.         gen rr = exp(b)
+.         gen rrlci = exp(lci)
+.         gen rruci = exp(uci)
+.         l method b lci uci rr*
+
+     +------------------------------------------------------------------------------+
+     |  method           b         lci         uci         rr      rrlci      rruci |
+     |------------------------------------------------------------------------------|
+  1. | Poisson   -.3566749   -.6621132   -.0512366         .7   .5157602   .9500539 |
+  2. |  Normal   -.2918514   -.6097996    .0260967   .7468795   .5434598    1.02644 |
+  3. |  N-BC-1   -.2916953   -.6072108    .0238202   .7469961   .5448685   1.024106 |
+  4. |  N-BC-2   -.2992875   -.6123673    .0137923   .7413462   .5420662   1.013888 |
+     +------------------------------------------------------------------------------+
+.         format b se lci uci %6.3f
+.         format rr* %6.2f
+.         l method b lci uci rr*
+
+     +-----------------------------------------------------------+
+     |  method        b      lci      uci     rr   rrlci   rruci |
+     |-----------------------------------------------------------|
+  1. | Poisson   -0.357   -0.662   -0.051   0.70    0.52    0.95 |
+  2. |  Normal   -0.292   -0.610    0.026   0.75    0.54    1.03 |
+  3. |  N-BC-1   -0.292   -0.607    0.024   0.75    0.54    1.02 |
+  4. |  N-BC-2   -0.299   -0.612    0.014   0.74    0.54    1.01 |
+     +-----------------------------------------------------------+
+. }
 
 . 
 . // Compute PLLFs: a bit slow
-. prog drop _all
-
 . use toydata, clear
 
 . forvalues i=1/2 {
@@ -174,5 +365,5 @@ file toydata_pllf.gph saved
       name:  <unnamed>
        log:  C:\ian\git\metafish\toydata\toydata.log
   log type:  text
- closed on:  29 May 2026, 18:42:56
+ closed on:   7 Aug 2026, 18:36:29
 ----------------------------------------------------------------------------------------------------
