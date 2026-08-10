@@ -36,6 +36,7 @@ To do
 	Enable id variable in settings file
 	Consider creating a single results file 
 		- would avoid float/double difficulties with non-integer dgmvars
+	Consider making simcombine work straight after simsetup
 */
 
 prog def simrun

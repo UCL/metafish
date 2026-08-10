@@ -15,6 +15,11 @@ version 16
 syntax [if] [in], [settings(string) nosort]
 if mi("`settings'") local settings simrun_settings
 
+cap confirm frame `settings'
+if _rc {
+	di as error "Settings frame not found. Have you run simsetup?"
+	exit 498
+}
 frame `settings' {
 	local allthings: char _dta[simrun_allthings] 
 	foreach thing of local allthings {
@@ -29,6 +34,12 @@ foreach frame in results data {
 // END OF PARSING
 
 frame change `settings'
+cap confirm var postfilename
+if _rc {
+	di as error "Variable postfilename not found. Have you run simrun?"
+	exit 498
+}
+
 marksample touse
 summ `touse', meanonly
 local n = r(N)
