@@ -48,3 +48,27 @@ Outputs
 Notes
 	The command metafish had the earlier name of meta2p when the simulation was run. Similarly, the repository metafish was previously called TwoStagePoisson. Both names have been changed by editing the do files and the log files.
 	"twoSP" in the file names reflects an earlier concept of the Poisson approximation method as a two-stage meta-analysis method, while we now present it as an aggregate data meta-analysis method.
+
+Graph names from twoSPsimresults.do
+	Fig 3 - discrep_ref
+	Fig 4 - discrep_sd
+	Fig 5 - homCE_1_pctbias
+	Fig 6 - homCE_1_empse
+	Fig 7 - homCE_1_cover
+	Fig 8 - homCE_1_power
+	Fig 9 - het_1_pctbias
+	Fig 10 - het_1_empse
+	Fig 11 - het_1_cover
+	Fig 12 - het_1_power
+	Fig 13 - [not from simulation]
+	Fig 14 - weightingCE_1_pctbias
+	Fig 15 - weightingCE_1_modelse
+	Fig 16 - weightingRE_1_pctbias
+	Fig 17 - weightingRE_1_modelse
+	Fig 18 - centringPU_1_pctbias
+	Fig 19 - centringPU_1_cover
+	Fig 20 - centringWei_1_pctbias
+	Fig 21 - centringWei_1_cover
+	Fig 22 - compareC_1_pctbias
+	Fig 23 - compareC_1_modelse
+	Fig 24 - tauhet_1_mean

@@ -41,12 +41,12 @@ siman nes pctbias, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(black green purple) lpat(solid = =) ///
-	name(compareC,replace) yla(-15(5)5)
+	name(compareC,replace) yla(-15(5)5) xtitle("Data generating models")
 siman nes modelse, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(black green purple) lpat(solid = =) ///
-	name(compareC,replace) yla(0 .1 .2 .3)
+	name(compareC,replace) yla(0 .1 .2 .3) xtitle("Data generating models")
 * the 3 methods have indistinguishable bias and modelSE
 table studies method if rep==-4, stat(min s) stat(max s)
 table studies method if rep==-6, stat(min s) stat(max s)
@@ -62,25 +62,25 @@ siman nes pctbias ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(weightingCE,replace) yla(-15(5)5)
+	name(weightingCE,replace) yla(-15(5)5) xtitle("Data generating models")
 siman nes modelse ///
 	if inlist(method,"PU":methodlabel,"PW":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(weightingCE,replace) yla(.1 .2 .3)
+	name(weightingCE,replace) yla(.1 .2 .3) xtitle("Data generating models")
 siman nes pctbias ///
 	if inlist(method,"PU_REc":methodlabel,"PW_REc":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(weightingRE,replace) yla(-15(5)5)
+	name(weightingRE,replace) yla(-15(5)5) xtitle("Data generating models")
 siman nes modelse ///
 	if inlist(method,"PU_REc":methodlabel,"PW_REc":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(weightingRE,replace) yla(.1 .2 .3 .4)
+	name(weightingRE,replace) yla(.1 .2 .3 .4) xtitle("Data generating models")
 table gamma studies if rep<0 & _perf=="pctbias", stat(max s) stat(min s) nformat(%6.3f)
 * pctbias: Monte Carlo error varies from 0.9 to 2.7 with 5 studies and from 0.4 to 1.3 with 20 studies
 * modelse: Monte Carlo error < 0.003
@@ -96,25 +96,25 @@ siman nes pctbias ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(centringPU,replace) yla(-15(5)5)
+	name(centringPU,replace) yla(-15(5)5) xtitle("Data generating models")
 siman nes cover ///
 	if inlist(method,"PU_RE":methodlabel,"PU_REc":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(red =) lpat(solid dash) ///
-	name(centringPU,replace) yla(80(5)100)
+	name(centringPU,replace) yla(80(5)100) xtitle("Data generating models")
 siman nes pctbias ///
 	if inlist(method,"Wei_RE":methodlabel,"Wei_REc":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(black =) lpat(solid dash) ///
-	name(centringWei,replace) yla(-15(5)5)
+	name(centringWei,replace) yla(-15(5)5) xtitle("Data generating models")
 siman nes cover ///
 	if inlist(method,"Wei_RE":methodlabel,"Wei_REc":methodlabel), ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
 	lcol(black =) lpat(solid dash) ///
-	name(centringWei,replace) yla(80(5)100)
+	name(centringWei,replace) yla(80(5)100) xtitle("Data generating models")
 table studies method if rep==-4, stat(min s) stat(max s)
 * pctbias: Monte Carlo error varies from 0.9 to 2.9 with 5 studies and from 0.4 to 1.3 with 20 studies
 table studies method if rep==-13, stat(min s) stat(max s)
@@ -173,19 +173,19 @@ siman tab pctbias empse cover power if tau==0 & method<=3, col(method gamma stud
 siman nes pctbias if tau==0 & method<=3, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) yla(-10 0 10 20) ///
-	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace)
+	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace) xtitle("Data generating models")
 siman nes empse if tau==0 & method<=3, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) yla(0 .1 .2 .3 .4) ///
-	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace)
+	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace) xtitle("Data generating models")
 siman nes cover if tau==0 & method<=3, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) yla(94/98) ///
-	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace)
+	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace) xtitle("Data generating models")
 siman nes power if tau==0 & method<=3, ///
 	legend(pos(3) col(1)) stagger(.05) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) yla(0 50 100) ///
-	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace)
+	lcol(black blue red =) lpat(solid = = dash) name(homCE,replace) xtitle("Data generating models")
 * summarise MCSEs
 table gamma studies if rep<0 & _perf=="pctbias" & tau==0 & method<=3, stat(max s) stat(min s) nformat(%6.1f)
 * pctbias: MCSE varies from 0.9 to 2.7 with 5 studies and from 0.4 to 1.2 with 20 studies
@@ -199,22 +199,22 @@ siman nes pctbias if tau>0, ///
 	legend(pos(3) col(1)) stagger(.08) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) ///
 	lcol(black blue red black blue red) lpat(solid = = dash = =) ///
-	name(het,replace) yla(-30 -20 -10 0) debug
+	name(het,replace) yla(-30 -20 -10 0) debug xtitle("Data generating models")
 siman nes empse if tau>0, ///
 	legend(pos(3) col(1)) stagger(.08) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) ///
 	lcol(black blue red black blue red) lpat(solid = = dash = =) ///
-	name(het,replace) 
+	name(het,replace)  xtitle("Data generating models")
 siman nes cover if tau>0, ///
 	legend(pos(3) col(1)) stagger(.08) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) ///
 	lcol(black blue red black blue red) lpat(solid = = dash = =) ///
-	name(het,replace) yla(70 80 90 100)
+	name(het,replace) yla(70 80 90 100) xtitle("Data generating models")
 siman nes pctbias empse cover power if tau>0, ///
 	legend(pos(3) col(1)) stagger(.08) $PPT ///
 	dglabsize(small) lw(*2 ...) dglwidth(*2) ///
 	lcol(black blue red black blue red) lpat(solid = = dash = =) ///
-	name(het,replace) yla(0 50 100)
+	name(het,replace) yla(0 50 100) xtitle("Data generating models")
 
 * summarise MCSEs
 table gamma studies if _perf=="pctbias" & tau>0, stat(min s) stat(max s) nformat(%6.1f)
@@ -240,7 +240,7 @@ siman tab mean if truetau>0, row(truetau gamma aratio studies)
 siman nes mean if truetau>0, ///
 	legend(pos(3) col(1)) stagger(.05) ///
 	$PPT dglabsize(small) lw(*2 = = =) dglwidth(*2) ///
-	lcol(blue red) lpat(dash dash) name(tauhet,replace) yla(0 .1 .2 .3)
+	lcol(blue red) lpat(dash dash) name(tauhet,replace) yla(0 .1 .2 .3) xtitle("Data generating models")
 table gamma studies if rep<0 & _perf=="mean" & truetau>0, stat(max _se) stat(min _se) nformat(%6.3f)
 * Mean: Monte Carlo error < 0.007
 
