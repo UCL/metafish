@@ -55,9 +55,9 @@ if `ndoublezero' {
 	di as text "Ignoring " as result `ndoublezero' as text " double-zero studies"
 }
 if `nsinglezero' {
-	di as text "Found " as result `nsinglezero' as text " single-zero studies: comparing events/person-years " _c
-	if !mi("`pyears'") di as text "using reported person-years"
-	else di as text "assuming equal person-years"
+	di as text "{p 0 2}Found " as result `nsinglezero' as text " single-zero studies: comparing events/person-years " _c
+	if !mi("`pyears'") di as text "using reported person-years{p_end}"
+	else di as text "assuming equal person-years{p_end}"
 }
 if !missing("`pyears'") { // these are observed pyears
 	local py1 : word 1 of `pyears'
@@ -90,7 +90,7 @@ if !mi("`se'") {
 	qui count if (`wtvar'>1+`wttolerance'/100 | `wtvar'<1-`wttolerance'/100) & !mi(`wtvar') 
 	if r(N) {
 		if !mi("`wt'") di as text "{p 0 2}Note: the Poisson approximation would mis-weight " r(N) ///
-			" studies by more than `wttolerance'%. The wt option will correct this.{p_end}"
+			" studies by more than `wttolerance'%; the wt option will correct this{p_end}"
 		else {
 			di as error "{p 0 2}Warning: the Poisson approximation mis-weights " r(N) ///
 			" studies by more than `wttolerance'%. Consider using the wt option.{p_end}"
