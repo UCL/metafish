@@ -149,8 +149,8 @@ scatter e bCox, mcol(blue) || ///
 replace method = "Normal approx" if method=="N"
 replace method = "Poisson approx" if method=="PU"
 label var sdb "Standard deviation of point estimates"
-scatter e sdb if gamma==-6 & aratio==1, by(method, legend(off) note("")) $PPT name(discrep_sd,replace)
-scatter e sdbw if gamma==-6 & aratio==1, by(method, legend(off) note("")) $PPT name(discrep_sdw,replace)
+scatter e sdb if gamma==-6 & aratio==1, mcol(blue) by(method, legend(off) note("")) $PPT name(discrep_sd,replace)
+scatter e sdbw if gamma==-6 & aratio==1, mcol(blue) by(method, legend(off) note("")) $PPT name(discrep_sdw,replace)
 
 * compare discriminatory ability of sdb and sdbw
 gen discrep = abs(e)>=0.05 if !mi(e)
